@@ -17,6 +17,23 @@ def test_options(context: Context):
 
     context.open()
 
-    expect_options = Select(context).options()
-    expect_options.should_have_count(2)
-    expect_options.should_have_text("foo", "bar")
+    select = Select(context)
+    select.should_options_have_count(2)
+    select.should_options_have_text("foo", "bar")
+
+
+def test_(context: Context):
+    data = {"Name": ["foo", "foo", "bar"]}
+
+    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+
+    @context.register_page
+    def index():
+        table = dataset["df"]
+        pybi.select(table["Name"])
+
+    context.open()
+
+    select = Select(context)
+    select.select_item("foo")
+    select.should_selected("foo")

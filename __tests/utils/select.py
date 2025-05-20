@@ -6,6 +6,10 @@ from __tests.screen import BaseContext
 
 
 _OPTIONS_SELECTOR = ".arco-select-dropdown"
+_OPTIONS_ITEM_SELECTOR = f"{_OPTIONS_SELECTOR} ul > li"
+_OPTIONS_ITEM_SELECTED_SELECTOR = (
+    f"{_OPTIONS_ITEM_SELECTOR}.arco-select-option-selected"
+)
 _SELECT_OPTION_OPENED_CLASS = "arco-select-view-opened"
 
 
@@ -33,38 +37,45 @@ class Select:
         if not opened:
             self.__click()
 
+        return self
+
     def __click(self):
         self.__page.click(self.__target_selector)
 
-    def options(self, auto_click: bool = True):
-        if auto_click:
-            self.open_options()
-        return SelectOption(self.__page, _OPTIONS_SELECTOR)
-
-
-class SelectOption:
-    def __init__(self, page: Page, selector: str) -> None:
-        self.__page = page
-        self.__selector = selector
-
-    def should_have_count(self, count: int):
-        expect(self.__page.locator(f"{self.__selector} li")).to_have_count(count)
+    def should_options_have_count(self, count: int):
+        expect(self.__page.locator(_OPTIONS_ITEM_SELECTOR)).to_have_count(count)
         return self
 
-    def should_have_text(self, *texts: str):
-        self.should_have_count(len(texts))
+    def should_options_have_text(self, *texts: str):
+        self.should_options_have_count(len(texts))
 
-        real_texts = self.__page.locator(
-            f"{self.__selector} ul > li"
-        ).all_text_contents()
+        real_texts = self.__page.locator(_OPTIONS_ITEM_SELECTOR).all_text_contents()
 
         assert (
             len(set(texts).difference(real_texts)) == 0
         ), f"Expected texts {texts} not found in {real_texts}"
         return self
 
-    def should_have_text_with_order(self, *texts: str):
-        expect(self.__page.locator(f"{self.__selector} ul > li")).to_have_text(
+    def should_options_have_text_with_order(self, *texts: str):
+        expect(self.__page.locator(_OPTIONS_ITEM_SELECTOR)).to_have_text(list(texts))
+        return self
+
+    def should_selected(self, *texts: str):
+        self.open_options()
+        expect(self.__page.locator(_OPTIONS_ITEM_SELECTED_SELECTOR)).to_have_text(
             list(texts)
         )
+
+    def select_item(self, *texts: str):
+        self.open_options()
+
+        for text in texts:
+            self.__page.locator(
+                f"{_OPTIONS_SELECTOR} ul > li.arco-select-option"
+            ).filter(has_text=re.compile(f"^{text}$")).click()
+
         return self
+
+
+def _options_item_selector():
+    return f"{_OPTIONS_SELECTOR} ul > li"

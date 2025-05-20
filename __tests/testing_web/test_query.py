@@ -18,7 +18,7 @@ def test_base(context: Context):
 
     context.open()
 
-    Table(context).one_cell().should_see("18.5")
+    Table(context).should_values_any_cell("18.5")
 
 
 def test_select_columns(context: Context):
@@ -35,5 +35,5 @@ def test_select_columns(context: Context):
     context.open()
     table = Table(context)
 
-    table.one_cell().should_see("foo", "18")
-    table.one_cell().should_not_see("1")
+    table.should_values_any_cell("foo", "18")
+    table.should_values_not_any_cell("1")
