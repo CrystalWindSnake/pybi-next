@@ -45,7 +45,7 @@ data = {
 dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
 
 
-@pybi.page()
+@ui.page()
 def index():
     table = dataset["df"]
 
