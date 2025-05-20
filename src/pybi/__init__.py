@@ -2,9 +2,7 @@ __all__ = [
     "__version__",
     "data_view",
     "query",
-    "page",
     "label",
-    "server",
     "duckdb",
     "column",
     "row",
@@ -17,7 +15,7 @@ __all__ = [
 ]
 
 from .version import __version__
-from instaui.ui import page, server, column, row, label, grid
+from instaui.ui import column, row, label, grid
 from .link_sql import duckdb
 from .components.radio import radio
 from .components.select import select
