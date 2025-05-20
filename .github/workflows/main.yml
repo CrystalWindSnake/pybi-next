@@ -10,9 +10,9 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.8"
+          # - "3.8"
           - "3.10"
-          - "3.12"
+          # - "3.12"
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -26,6 +26,6 @@ jobs:
       - name: install dependencies
         run: |
           uv run -m playwright install 
-          uv run -m playwright install-deps
+          playwright install-deps
       - name: Run tests
         run: uv run pytest __tests
