@@ -2,7 +2,7 @@ from __tests.testing_web.context import Context
 from instaui import ui
 import pandas as pd
 import pybi
-from .utils import Table
+from __tests.utils import Table
 
 
 def test_base(context: Context):

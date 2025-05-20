@@ -3,7 +3,7 @@ from instaui import ui
 import pandas as pd
 import pybi
 from . import utils
-from .utils import Table
+from __tests.utils import Table
 
 
 def test_data_from_pandas(context: Context):
