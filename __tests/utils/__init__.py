@@ -1,3 +1,3 @@
-__all__ = ["Table"]
+__all__ = ["Table", "Select"]
 from .table import Table
-# from .select import Select
+from .select import Select
