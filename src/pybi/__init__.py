@@ -19,7 +19,6 @@ __all__ = [
 from .version import __version__
 from instaui.ui import page, server, column, row, label, grid
 from .link_sql import duckdb
-from instaui.arco import *  # noqa: F403
 from .components.radio import radio
 from .components.select import select
 from .components.table import table
