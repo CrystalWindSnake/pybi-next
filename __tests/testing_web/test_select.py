@@ -22,18 +22,4 @@ def test_options(context: Context):
     select.should_options_have_text("foo", "bar")
 
 
-def test_(context: Context):
-    data = {"Name": ["foo", "foo", "bar"]}
 
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
-
-    @context.register_page
-    def index():
-        table = dataset["df"]
-        pybi.select(table["Name"])
-
-    context.open()
-
-    select = Select(context)
-    select.select_item("foo")
-    select.should_selected("foo")

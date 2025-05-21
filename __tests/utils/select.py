@@ -11,6 +11,7 @@ _OPTIONS_ITEM_SELECTED_SELECTOR = (
     f"{_OPTIONS_ITEM_SELECTOR}.arco-select-option-selected"
 )
 _SELECT_OPTION_OPENED_CLASS = "arco-select-view-opened"
+_CLEAR_BTN_SELECTOR = ".arco-select-view-clear-btn"
 
 
 class Select:
@@ -67,6 +68,12 @@ class Select:
         )
 
     def select_item(self, *texts: str):
+        """
+        .. code-block:: python
+        # if foo and bar not selected, click them
+        select.select_item("foo", "bar")
+
+        """
         self.open_options()
 
         for text in texts:
@@ -76,6 +83,22 @@ class Select:
 
         return self
 
+    def click_items(self, *texts: str):
+        """
+        .. code-block:: python
+        # only click foo and bar whatever they are selected or not
+        select.click_items("foo", "bar")
 
-def _options_item_selector():
-    return f"{_OPTIONS_SELECTOR} ul > li"
+        """
+        self.open_options()
+
+        for text in texts:
+            self.__page.locator(
+                f"{_OPTIONS_SELECTOR} ul > li.arco-select-option"
+            ).filter(has_text=re.compile(f"^{text}$")).click()
+
+        return self
+
+    def click_clear_btn(self):
+        self.__page.locator(self.__target_selector).hover()
+        self.__page.click(f"{self.__target_selector} {_CLEAR_BTN_SELECTOR}")
