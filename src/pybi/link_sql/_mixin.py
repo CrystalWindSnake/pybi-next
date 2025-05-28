@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Protocol, Sequence, Union
 from typing_extensions import overload
 from dataclasses import dataclass
 from instaui import ui
+from . import _const
 
 if TYPE_CHECKING:
     from .data_view import DataView
@@ -52,6 +53,9 @@ class DataSetQueryInfo:
     columns: List[str]
     values: List[List[Any]]
 
+    def flat_values(self):
+        return [v[0] for v in self.values]
+
 
 class DataSetMixin(ABC):
     @abstractmethod
@@ -84,10 +88,15 @@ class DataColumnMixin(ABC):
     def field(self) -> str:
         pass
 
+    @property
     @abstractmethod
-    def get_element_ref(self) -> ui.element_ref:
+    def source_name(self) -> str:
         pass
 
     @abstractmethod
-    def get_data_view(self) -> DataView:
+    def get_source_type(self) -> _const.TSourceType:
+        pass
+
+    @abstractmethod
+    def get_element_ref(self) -> ui.element_ref:
         pass

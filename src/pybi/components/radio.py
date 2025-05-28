@@ -5,8 +5,8 @@ from instaui.arco import component_types
 
 from pybi.link_sql import data_set_store
 from pybi.link_sql._mixin import DataColumnMixin
-from pybi.link_sql.data_view_store import DataViewStore
-from pybi.link_sql.query import query
+# from pybi.link_sql.data_view_store import DataViewStore
+# from pybi.link_sql.query import query
 
 _DEFAULT_PROPS = {}
 
