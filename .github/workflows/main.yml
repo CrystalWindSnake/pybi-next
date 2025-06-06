@@ -7,6 +7,8 @@ on:
 jobs:
   run-all-test:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.47.0-focal
     strategy:
       matrix:
         python-version:
@@ -22,7 +24,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install the project
         run: uv sync --locked --all-extras --dev
-      - name: install dependencies
-        run: uv run -m playwright install --with-deps
       - name: Run tests
         run: uv run pytest __tests
