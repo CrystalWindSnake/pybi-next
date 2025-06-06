@@ -56,7 +56,7 @@ def index():
     with pybi.grid(rows="30vh auto 1fr").classes("max-w-[800px] mx-auto gap-2"):
         pybi.echarts(bar_options(table, x="name", y="age"))
         pybi.select(table["Class"])
-        pybi.select(table["name"])
+        pybi.select(table["name"], multiple=True)
         pybi.table(gp_query)
 
 

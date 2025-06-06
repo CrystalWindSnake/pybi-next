@@ -1,10 +1,6 @@
 from typing import Optional
 from instaui import ui
-
-# from pybi.link_sql.data_view import DataView
-
 import pybi
-from pybi.link_sql.query import query
 from pybi.components.echarts import EChartsOption
 from pybi.link_sql._mixin import QueryableMixin
 
@@ -13,15 +9,16 @@ from pybi.link_sql._mixin import QueryableMixin
 _series_options = {"label": {"show": True, "align": "center"}}
 
 # https://echarts.apache.org/zh/option.html#xAxis
-_xAxis_options = {"axisLabel": {"rotate": 30}}
+_xAxis_options = {"axisLabel": {"rotate": 30}, "type": "category"}
 
 _yAxis_options = {}
 
 
 _extend_options = {
     "series_options": _series_options,
-    "_xAxis_options": _xAxis_options,
-    "_yAxis_options": _yAxis_options,
+    "xAxis": _xAxis_options,
+    "yAxis": _yAxis_options,
+    "tooltip": {},
 }
 
 
@@ -38,12 +35,11 @@ def bar_options(
         inputs=[pybi.query(sql), x, y, _extend_options],
         code=r"""(query_result, x,y,extend_options)=>{
         const source = [query_result.columns,...query_result.values]
-        const {series_options,_xAxis_options,_yAxis_options} = extend_options
+        const {series_options, ...others_options} = extend_options
         
         return {
+            ...others_options,
             dataset: {source},
-            xAxis: {..._xAxis_options, type: 'category'},
-            yAxis: {..._yAxis_options },
             series: [{
                     ...series_options,
                     type: 'bar',
