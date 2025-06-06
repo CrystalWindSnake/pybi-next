@@ -29,7 +29,7 @@ def select(
         )
 
     source_from_server = _server_query.create_source(
-        f"SELECT DISTINCT {field} FROM {source_name}",
+        f"SELECT DISTINCT {field} FROM {source_name} ORDER BY {field} ASC",
         exclude_filter_view_name=exclude_filter_view_name,
         exclude_filter_query_key=exclude_filter_query_key,
     ).flat_values()
