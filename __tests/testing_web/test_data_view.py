@@ -82,7 +82,10 @@ def test_computed_binding(context: Context):
         pybi.label(result)
 
     context.open()
-    context.should_see("[['foo', 18], ['bar', 19]]", equal_to=True)
+    context.should_see(
+        "{'columns': ['Name', 'Age'], 'values': [['foo', 18], ['bar', 19]]}",
+        equal_to=True,
+    )
 
 
 def test_selected_column_computed_binding(context: Context):

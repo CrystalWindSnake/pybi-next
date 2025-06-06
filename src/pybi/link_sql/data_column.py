@@ -1,44 +1,23 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict, cast
+from typing import Any, Dict, List, cast
 from instaui.vars.mixin_types.element_binding import ElementBindingMixin
 from instaui.vars.mixin_types.observable import ObservableMixin
 
-from ._mixin import DataColumnMixin
-
-if TYPE_CHECKING:
-    from .data_view import DataView
-
-
-class DataColumn(DataColumnMixin, ObservableMixin, ElementBindingMixin):
-    def __init__(self, data_view: DataView, field: str) -> None:
-        self._data_view = data_view
-        self.__field = field
-
-    @property
-    def field(self) -> str:
-        return self.__field
-
-    def get_element_ref(self):
-        return self._data_view._data_source_element._ele_ref
-
-    def get_data_view(self) -> DataView:
-        return self._data_view
-
-    def _to_element_binding_config(self) -> Dict:
-        return cast(
-            ElementBindingMixin, self._data_view.flat_values()
-        )._to_element_binding_config()
-
-    def _to_observable_config(self):
-        return cast(
-            ObservableMixin, self._data_view.flat_values()
-        )._to_observable_config()
+from pybi.link_sql import _server_query
+from pybi.link_sql import sql_stem
+from ._mixin import DataColumnMixin, QueryResultMixin
 
 
-class DataViewColumn(DataColumnMixin, ObservableMixin, ElementBindingMixin):
+class DataViewColumn(
+    DataColumnMixin, QueryResultMixin, ObservableMixin, ElementBindingMixin
+):
     def __init__(self, source_name: str, field: str) -> None:
         self._source_name = source_name
         self.__field = field
+
+        self.__source = _server_query.create_source(
+            f"SELECT {field} FROM {source_name}"
+        )
 
     @property
     def field(self) -> str:
@@ -48,33 +27,63 @@ class DataViewColumn(DataColumnMixin, ObservableMixin, ElementBindingMixin):
     def source_name(self) -> str:
         return self._source_name
 
-    def _to_element_binding_config(self) -> Dict:
-        raise NotImplementedError
-
-    def _to_observable_config(self):
-        raise NotImplementedError
-
-    def get_element_ref(self) -> ElementRef:
-        raise NotImplementedError
-
-    def get_data_view(self) -> DataView:
-        raise NotImplementedError
-
     def get_source_type(self):
         return "view"
 
-    # def get_element_ref(self):
-    #     return self._data_view._data_source_element._ele_ref
+    def _to_element_binding_config(self) -> Dict:
+        self.__source.source._mark_used()
+        return self.__source.flat_values()._to_element_binding_config()
 
-    # def get_data_view(self) -> DataView:
-    #     return self._data_view
+    def _to_observable_config(self):
+        self.__source.source._mark_used()
+        return self.__source.flat_values()._to_observable_config()
 
-    # def _to_element_binding_config(self) -> Dict:
-    #     return cast(
-    #         ElementBindingMixin, self._data_view.flat_values()
-    #     )._to_element_binding_config()
+    def flat_values(
+        self,
+    ):
+        return self.__source.flat_values()
 
-    # def _to_observable_config(self):
-    #     return cast(
-    #         ObservableMixin, self._data_view.flat_values()
-    #     )._to_observable_config()
+    def distinct(self):
+        return _server_query.create_source(
+            f"SELECT DISTINCT {self.field} FROM {self.source_name}",
+        ).flat_values()
+
+
+class DataQueryColumn(
+    DataColumnMixin, QueryResultMixin, ObservableMixin, ElementBindingMixin
+):
+    def __init__(self, source_name: str, field: str) -> None:
+        self._source_name = source_name
+        self.__field = field
+        self._sql = f"SELECT {field} FROM {source_name}"
+
+        self.__source = _server_query.create_source(self._sql)
+
+    def _to_element_binding_config(self) -> Dict:
+        self.__source.source._mark_used()
+        return self.__source.flat_values()._to_element_binding_config()
+
+    def _to_observable_config(self):
+        self.__source.source._mark_used()
+        return self.__source.flat_values()._to_observable_config()
+
+    def flat_values(
+        self,
+    ):
+        return self.__source.flat_values()
+
+    @property
+    def field(self) -> str:
+        return self.__field
+
+    @property
+    def source_name(self) -> str:
+        return self._source_name
+
+    def get_source_type(self):
+        return "query"
+
+    def distinct(self):
+        return _server_query.create_source(
+            f"SELECT DISTINCT {self.field} FROM {self.source_name}",
+        ).flat_values()

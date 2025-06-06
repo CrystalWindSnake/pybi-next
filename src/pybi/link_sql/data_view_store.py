@@ -1,70 +1,71 @@
-# from contextvars import ContextVar
-# from typing import TYPE_CHECKING, Dict, Optional, Set
-# from instaui import ui
-# from collections import defaultdict
-
-# from pybi.link_sql import _utils
-
-
-# if TYPE_CHECKING:
-#     from .data_view import DataView
+from __future__ import annotations
+from contextvars import ContextVar
+from typing import Any, Dict, TYPE_CHECKING, Optional, cast
+from instaui import ui
+from instaui.components.element import Element
+from instaui.vars.state import RefProxy
+from collections import defaultdict
+from pybi.link_sql import sql_stem
 
 
-# class DataViewStore(ui.element):
-#     _data_view_store_context: ContextVar[Optional["DataViewStore"]] = ContextVar(
-#         "data_view_store_context", default=None
-#     )
+if TYPE_CHECKING:
+    from pybi.link_sql.data_view import DataView
 
-#     def __init__(self):
-#         super().__init__("template")
-#         self._name_to_data_view_map: Dict[str, "DataView"] = {}
-#         self._org_data = {}
-#         self.data = ui.state(self._org_data)
-#         self._field_query_id_count: Dict[str, int] = defaultdict(lambda: 0)
-
-#     def gen_field_query_id(self, field: str):
-#         self._field_query_id_count[field] += 1
-#         return self._field_query_id_count[field]
-
-#     def store_view(self, sql: str, data_view: "DataView"):
-#         name = self.__gen_name()
-#         self._org_data[name] = sql
-#         self._name_to_data_view_map[name] = data_view
-#         return name
-
-#     def get_data_view(self, name: str):
-#         return self._name_to_data_view_map[name]
-
-#     def __gen_name(self):
-#         id = len(self._org_data)
-#         return f"'@_{id}_@'"
-
-#     @classmethod
-#     def get(cls) -> "DataViewStore":
-#         dv = cls._data_view_store_context.get()
-#         if dv is None:
-#             dv = cls()
-#             cls._data_view_store_context.set(dv)
-
-#         return cls._data_view_store_context.get()  # type: ignore
-
-#     def _to_json_dict(self):
-#         self.data._ref_.value = self._org_data  # type: ignore
-#         return super()._to_json_dict()
+_TViewName = str
+_TFilter = Dict[str, Any]
 
 
-# def get_dependency_views(sql: str):
-#     stack = [
-#         DataViewStore.get().get_data_view(name)
-#         for name in _utils.extract_special_tags(sql)
-#     ]
+class Store(Element):
+    _store_context: ContextVar[Optional[Store]] = ContextVar(
+        "_store_context", default=None
+    )
 
-#     result: Set[DataView] = set(stack)
+    def __init__(self):
+        super().__init__("template")
+        self._sql_map: Dict[str, str] = {}
+        self._view_filters: Dict[_TViewName, _TFilter] = {}
+        self.sql_orders = ui.data({})
+        self.sql_map = ui.state({})
+        self._field_query_id_count: Dict[str, int] = defaultdict(lambda: 0)
+        self._view_obj_map: Dict[_TViewName, DataView] = {}
 
-#     while stack:
-#         view = stack.pop()
-#         result.add(view)
+    @property
+    def server_sql_map(self):
+        return self._sql_map
 
-#         stack.extend(get_dependency_views(view.sql_str))
+    def gen_field_query_id(self, field: str):
+        self._field_query_id_count[field] += 1
+        return self._field_query_id_count[field]
 
-#     return list(result)
+    def store_view(self, view: DataView, sql: str):
+        self._sql_map[view.name] = sql
+        self._view_filters[view.name] = ui.state({})
+        self._view_obj_map[view.name] = view
+
+    def get_view(self, view_name: str) -> DataView:
+        return self._view_obj_map[view_name]
+
+    def store_query(self, query_name: str, sql: str):
+        self._sql_map[query_name] = sql
+
+    def get_filters(self, view_name: str):
+        assert view_name in self._view_filters, f"{view_name} not found"
+        return self._view_filters[view_name]
+
+    @classmethod
+    def get(cls) -> Store:
+        dv = cls._store_context.get()
+        if dv is None:
+            dv = cls()
+            cls._store_context.set(dv)
+
+        return cls._store_context.get()  # type: ignore
+
+    def _to_json_dict(self):
+        cast(RefProxy, self.sql_map)._ref_.value = self._sql_map
+        self.sql_orders.value = sql_stem.get_sql_execution_order(self._sql_map)
+        return super()._to_json_dict()
+
+
+def get_store():
+    return Store.get()

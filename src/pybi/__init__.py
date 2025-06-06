@@ -23,7 +23,7 @@ from .components.table import table
 from .components.input import input
 from .components.echarts import echarts
 from .link_sql.data_view import data_view
-# from .link_sql.query import query
+from .link_sql.query import Query as query
 
 
 from . import _setup  # noqa: F401

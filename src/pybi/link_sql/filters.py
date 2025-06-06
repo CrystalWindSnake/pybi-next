@@ -1,5 +1,5 @@
 from typing import Optional
-from pybi.link_sql.data_view import get_store
+from pybi.link_sql.data_view_store import get_store
 from pybi.link_sql import sql_stem
 from instaui import ui
 
@@ -13,10 +13,13 @@ def get_related_filters(
     store = get_store()
 
     orders = sql_stem.get_sql_execution_order(store._sql_map)
-    index = orders.index(source_name)
-    orders = orders[: index + 1]
+    source_level = orders[source_name]
 
-    views = [name for name in orders if sql_stem.get_source_type(name) == "view"]
+    views = [
+        name
+        for name, level in orders.items()
+        if level > source_level and sql_stem.get_source_type(name) == "view"
+    ]
     filters = [store.get_filters(name) for name in views]
 
     aggregate_filter = ui.js_computed(

@@ -1,45 +1,83 @@
 import typing
-from instaui import ui
+from instaui.vars.mixin_types.element_binding import ElementBindingMixin
+from instaui.vars.mixin_types.observable import ObservableMixin
+from pybi.link_sql import _mixin
+from pybi.link_sql.data_column import DataQueryColumn
+from pybi.link_sql.data_table import DataQueryTable
+from pybi.link_sql import _server_query
 
-from pybi.link_sql.data_set_store import get_data_set
-from pybi.link_sql.data_view import get_store as get_view_store
-from pybi.link_sql.filters import get_related_filters
-from pybi.link_sql import sql_stem
 
+class Query(
+    _mixin.QueryableMixin,
+    _mixin.QueryResultMixin,
+    ElementBindingMixin,
+    ObservableMixin,
+    _mixin.DataTableMixin,
+):
+    def __init__(
+        self, sql: str, *, dataset: typing.Optional[_mixin.DataSetMixin] = None
+    ) -> None:
+        self.__sql = sql
+        self.__dataset_id = dataset.get_id() if dataset else None
 
-def query(sql: str):
-    store = get_view_store()
-    query_name = sql_stem.gen_query_name()
-    store.store_query(query_name, sql)
-
-    filters = get_related_filters(query_name)
-
-    info = {
-        "main_query": query_name,
-        "dataset_id": store.get_view(source_name).dataset_id,
-    }
-
-    @ui.computed(
-        inputs=[
-            info,
-            filters,
-            store.sql_map,
-            store.sql_orders,
-        ]
-    )
-    def source_from_server(
-        info: typing.Dict,
-        filters: typing.Dict,
-        sql_map: typing.Dict[str, str],
-        sql_orders: typing.List[str],
-    ):
-        sql, params = sql_stem.build_sql(
-            main_query_name=info["main_query"],
-            filters=filters,
-            sql_map=sql_map,
-            sql_orders=sql_orders,
+        self.__server_info = _server_query.create_source(
+            self.__sql,
+            dataset_id=self.__dataset_id,
         )
 
-        rest = get_data_set(info["dataset_id"]).query(sql, params).flat_values()
-        print(f"{sql=}, {params=}, {rest=}")
-        return rest
+        self.__name = self.__server_info.query_name
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    def _to_sql(self):
+        return self.__sql
+
+    @typing.overload
+    def __getitem__(self, field: typing.List[str]) -> _mixin.DataTableMixin: ...
+
+    @typing.overload
+    def __getitem__(self, field: str) -> _mixin.DataColumnMixin: ...
+
+    def __getitem__(
+        self, field: typing.Union[str, typing.List[str]]
+    ) -> typing.Union[_mixin.DataColumnMixin, _mixin.DataTableMixin]:
+        if isinstance(field, str):
+            return DataQueryColumn(self.__name, field)
+
+        elif isinstance(field, list):
+            return DataQueryTable(self, field)
+
+        raise ValueError(f"Invalid field type: {type(field)}")
+
+    def flat_values(
+        self,
+    ):
+        return self.__server_info.flat_values()
+
+    def _to_observable_config(self):
+        return self.__server_info.source._to_observable_config()
+
+    def _to_element_binding_config(self) -> typing.Dict:
+        return self.__server_info.source._to_element_binding_config()
+
+    def __str__(self) -> str:
+        return self.__name
+
+    def get_query_sql(self) -> str:
+        return self.__sql
+
+    @property
+    def source_name(self) -> str:
+        return self.__name
+
+    @property
+    def dataset_id(self) -> typing.Optional[int]:
+        return self.__dataset_id
+
+    def get_source_type(self):
+        return "query"
+
+
+query = Query

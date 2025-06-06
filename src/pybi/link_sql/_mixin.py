@@ -1,18 +1,20 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, List, Optional, Protocol, Sequence, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    TypedDict,
+)
 from typing_extensions import overload
-from dataclasses import dataclass
 from instaui import ui
 from . import _const
 
 if TYPE_CHECKING:
     from .data_view import DataView
-    from .query import QueryInfo
-
-
-class CanGetitem(Protocol):
-    def __getitem__(self, item: str) -> Any: ...
 
 
 class QueryableMixin(ABC):
@@ -21,7 +23,7 @@ class QueryableMixin(ABC):
         pass
 
     @overload
-    def __getitem__(self, field: List[str]) -> QueryInfo: ...
+    def __getitem__(self, field: List[str]) -> DataTableMixin: ...
 
     @overload
     def __getitem__(self, field: str) -> DataColumnMixin: ...
@@ -29,32 +31,26 @@ class QueryableMixin(ABC):
     @abstractmethod
     def __getitem__(
         self, field: Union[str, List[str]]
-    ) -> Union[DataColumnMixin, QueryInfo]:
+    ) -> Union[DataColumnMixin, DataTableMixin]:
         pass
 
-    @property
-    @abstractmethod
-    def result(self) -> CanGetitem:
-        pass
 
+class QueryResultMixin(ABC):
     @abstractmethod
     def flat_values(self) -> ui.TMaybeRef[List[Any]]:
         pass
 
-    def values(self):
-        return self.result["values"]
+    # def values(self):
+    #     return self.result["values"]
 
-    def columns(self):
-        return self.result["columns"]
+    # def columns(self):
+    #     return self.result["columns"]
 
 
-@dataclass
-class DataSetQueryInfo:
+class DataSetQueryInfo(TypedDict, total=False):
     columns: List[str]
     values: List[List[Any]]
-
-    def flat_values(self):
-        return [v[0] for v in self.values]
+    sql: str
 
 
 class DataSetMixin(ABC):
@@ -68,17 +64,22 @@ class DataSetMixin(ABC):
 
 
 class DataTableMixin(ABC):
+    @abstractmethod
+    def get_query_sql(self) -> str:
+        pass
+
     @property
     @abstractmethod
-    def fields(self) -> Sequence[str]:
+    def source_name(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def dataset_id(self) -> Optional[int]:
         pass
 
     @abstractmethod
-    def get_element_ref(self) -> ui.element_ref:
-        pass
-
-    @abstractmethod
-    def get_data_view(self) -> DataView:
+    def get_source_type(self) -> _const.TSourceType:
         pass
 
 
@@ -98,5 +99,5 @@ class DataColumnMixin(ABC):
         pass
 
     @abstractmethod
-    def get_element_ref(self) -> ui.element_ref:
+    def distinct(self) -> List:
         pass
