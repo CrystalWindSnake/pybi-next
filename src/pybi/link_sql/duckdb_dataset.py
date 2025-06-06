@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from pybi.link_sql import data_set_store
-from pybi.link_sql._mixin import DataSetMixin, DataSetQueryInfo
+from pybi.link_sql._mixin import DataSetMixin
 from pybi.link_sql.data_view import DataView
 
 try:

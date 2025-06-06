@@ -10,7 +10,6 @@ def table(
     query: DataTableMixin,
     **kwargs: Unpack[component_types.TTable],
 ):
-    source_type = query.get_source_type()
     sql = query.get_query_sql()
     dataset_id = query.dataset_id
 

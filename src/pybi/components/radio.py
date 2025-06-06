@@ -1,12 +1,10 @@
-import typing
 from typing_extensions import Unpack
 from instaui import arco, ui
 from instaui.arco import component_types
 
-from pybi.link_sql import data_set_store
+from pybi.link_sql.data_view_store import get_store as get_view_store
 from pybi.link_sql._mixin import DataColumnMixin
-# from pybi.link_sql.data_view_store import DataViewStore
-# from pybi.link_sql.query import query
+from pybi.link_sql import _server_query
 
 _DEFAULT_PROPS = {}
 
@@ -15,40 +13,47 @@ def radio(
     options: DataColumnMixin,
     **kwargs: Unpack[component_types.TRadio],
 ):
-    data_view = options.get_data_view()
+    source_type = options.get_source_type()
+    source_name = options.source_name
     field = options.field
-    query_id = DataViewStore.get().gen_field_query_id(field)
-    query_key = f"{data_view.str_name}-{field}-{query_id}"
 
-    main_query_sql = (
-        f"SELECT DISTINCT {field} FROM ({data_view.sql_str}) ORDER BY {field} ASC"
-    )
-    source = query(
-        main_query_sql,
-        dataset=data_set_store.try_get_data_set(data_view._dataset_id),
-        exclude_query_key=query_key,
-        exclude_view_name=data_view.str_name,
+    exclude_filter_view_name = None
+    exclude_filter_query_key = None
+    if source_type == "view":
+        exclude_filter_view_name = source_name
+        exclude_filter_query_key = (
+            f"{field}-{get_view_store().gen_field_query_id(field)}"
+        )
+
+    source_from_server = _server_query.create_source(
+        f"SELECT DISTINCT {field} FROM {source_name}",
+        exclude_filter_view_name=exclude_filter_view_name,
+        exclude_filter_query_key=exclude_filter_query_key,
     ).flat_values()
 
-    element_ref = options.get_element_ref()
+    props = {**_DEFAULT_PROPS, **kwargs, "options": source_from_server}
 
-    props = {**_DEFAULT_PROPS, **kwargs}
+    element = arco.radio_group(**props)
 
-    on_change = ui.js_event(
-        inputs=[ui.event_context.e(), field, query_id],
-        outputs=[element_ref],
-        code=r"""(value,field,query_id) => {
-if (value) {
-return {method: 'addFilter', args:[{field, expr: `${field}= ?`,value,query_id}]};
-}
+    if source_type == "view":
+        view_store = get_view_store()
 
-return {method:'removeFilter', args:[{field,query_id}]};
-        }""",
-    )
+        on_change = ui.js_event(
+            inputs=[
+                ui.event_context.e(),
+                view_store.get_filters(source_name),
+                exclude_filter_query_key,
+                field,
+            ],
+            outputs=[view_store.get_filters(source_name)],
+            code=r"""(value,filters,query_key,field) => {
 
-    with arco.radio_group(**props) as group:
-        with ui.vfor(source) as item:
-            with arco.radio(item):
-                ui.content(item)
+    if (value === null || value === undefined || value === '' ){
+        const {[query_key]:_, ...rest} = filters
+        return rest    
+    }
 
-    return group.on_change(on_change)  # type: ignore
+    return {...filters, [query_key]: {expr: `${field} in ?`,value}}
+    }""",
+        )
+        element.on_change(on_change)

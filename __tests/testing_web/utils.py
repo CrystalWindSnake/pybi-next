@@ -1,10 +1,8 @@
 from pathlib import Path
 import os
-import re
 import pandas as pd
 import duckdb
 
-from __tests.testing_web.context import Context
 
 __DIR__ = Path(__file__).parent / ".dataset"
 

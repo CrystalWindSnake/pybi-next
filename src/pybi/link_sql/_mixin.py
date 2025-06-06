@@ -5,7 +5,6 @@ from typing import (
     Any,
     List,
     Optional,
-    Sequence,
     Union,
     TypedDict,
 )
@@ -14,7 +13,7 @@ from instaui import ui
 from . import _const
 
 if TYPE_CHECKING:
-    from .data_view import DataView
+    pass
 
 
 class QueryableMixin(ABC):
