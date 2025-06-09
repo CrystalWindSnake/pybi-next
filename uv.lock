@@ -53,7 +53,7 @@ dependencies = [
     { name = "exceptiongroup", marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
     { name = "idna", marker = "python_full_version >= '3.9'" },
     { name = "sniffio", marker = "python_full_version >= '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/95/7d/4c1bd541d4dffa1b52bd83fb8527089e097a106fc90b467a7313b105f840/anyio-4.9.0.tar.gz", hash = "sha256:673c0c244e15788651a4ff38710fea9675823028a6f08a5eda409e0c9840a028" }
 wheels = [
@@ -310,7 +310,7 @@ version = "1.3.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88" }
 wheels = [
@@ -327,7 +327,7 @@ dependencies = [
     { name = "starlette", version = "0.44.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
     { name = "starlette", version = "0.46.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/f4/55/ae499352d82338331ca1e28c7f4a63bfd09479b16395dce38cf50a39e2c2/fastapi-0.115.12.tar.gz", hash = "sha256:1e2c2a2646905f9e83d32f04a3f86aff4a286669c6c950ca95b5fd68c2602681" }
 wheels = [
@@ -522,8 +522,8 @@ wheels = [
 
 [[package]]
 name = "instaui"
-version = "0.1.15"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+version = "0.1.16"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "orjson", version = "3.10.15", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
@@ -531,11 +531,11 @@ dependencies = [
     { name = "pydantic", version = "2.10.6", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
     { name = "pydantic", version = "2.11.5", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/28/97/dea3308b04df87bfb7354f32a744edd783c030c697000803b9ef04ef9a59/instaui-0.1.15.tar.gz", hash = "sha256:7990d9aca56900780a155a7b3296d6fdeab201d26b8cf4eae58a27f2bb39abe2", size = 1307574, upload-time = "2025-06-02T18:13:53.17Z" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ae/43/e77ee91ed87e351aa3abc929792d908c8b9469076124298dd16f315cf5b4/instaui-0.1.16.tar.gz", hash = "sha256:60f228be098c139a91061d4ce82d950f75de59db7c6ba26bd01c718adf8f1bcf" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/9a/84/e68ba724e77761a487e973298ec9ca79d1e1e7981155b843e02de268ba47/instaui-0.1.15-py2.py3-none-any.whl", hash = "sha256:fed808a48a12087a045b47b9367dbfa8ad1380a4eb2351d8dfcf1b7c0a57f18b", size = 1421925, upload-time = "2025-06-02T18:13:49.315Z" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/c0/15/8b47e3b940940e6bb6684faba47bf4bd3ce17e5194d1628381a89f36a3e6/instaui-0.1.16-py2.py3-none-any.whl", hash = "sha256:3592e4907d9f053edf407c37e7e3095db3c927bc1047848522303147039c42fa" },
 ]
 
 [package.optional-dependencies]
@@ -1184,7 +1184,7 @@ dev = [
     { name = "pandas", version = "2.2.3", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "playwright" },
     { name = "pytest", version = "8.3.5", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "pytest", version = "8.4.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "pytest", version = "8.4.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "pytest-asyncio", version = "0.24.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
     { name = "pytest-asyncio", version = "1.0.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "pytest-playwright" },
@@ -1196,7 +1196,7 @@ lint = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", marker = "extra == 'web'", specifier = ">=1.2.2" },
-    { name = "instaui", specifier = ">=0.1.15" },
+    { name = "instaui", specifier = ">=0.1.16" },
     { name = "instaui", extras = ["all"], marker = "extra == 'all'" },
     { name = "instaui", extras = ["web"], marker = "extra == 'web'" },
     { name = "instaui", extras = ["webview"], marker = "extra == 'webview'" },
@@ -1256,7 +1256,7 @@ resolution-markers = [
 dependencies = [
     { name = "annotated-types", marker = "python_full_version >= '3.9'" },
     { name = "pydantic-core", version = "2.33.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "typing-inspection", marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/f0/86/8ce9040065e8f924d642c58e4a344e33163a07f6b57f836d0d734e0ad3fb/pydantic-2.11.5.tar.gz", hash = "sha256:7f853db3d0ce78ce8bbb148c401c2cdd6431b3473c0cdff2755c7690952a7b7a" }
@@ -1374,7 +1374,7 @@ resolution-markers = [
     "python_full_version == '3.9.*'",
 ]
 dependencies = [
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ad/88/5f2260bdfae97aabf98f1778d43f69574390ad787afb646292a638c923d4/pydantic_core-2.33.2.tar.gz", hash = "sha256:7cb8bc3605c29176e1b105350d2e6474142d7c1bd1d9327c4a9bdb46bf827acc" }
 wheels = [
@@ -1467,7 +1467,7 @@ version = "12.0.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/d2/a7/8faaa62a488a2a1e0d56969757f087cbd2729e9bcfa508c230299f366b4c/pyee-12.0.0.tar.gz", hash = "sha256:c480603f4aa2927d4766eb41fa82793fe60a82cbfdb8d688e0d08c55a534e145" }
 wheels = [
@@ -1686,7 +1686,7 @@ wheels = [
 [[package]]
 name = "pytest"
 version = "8.4.0"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 resolution-markers = [
     "python_full_version >= '3.12'",
     "python_full_version == '3.11.*'",
@@ -1702,9 +1702,9 @@ dependencies = [
     { name = "pygments", marker = "python_full_version >= '3.9'" },
     { name = "tomli", marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/fb/aa/405082ce2749be5398045152251ac69c0f3578c7077efc53431303af97ce/pytest-8.4.0.tar.gz", hash = "sha256:14d920b48472ea0dbf68e45b96cd1ffda4705f33307dcc86c676c1b5104838a6", size = 1515232, upload-time = "2025-06-02T17:36:30.03Z" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/fb/aa/405082ce2749be5398045152251ac69c0f3578c7077efc53431303af97ce/pytest-8.4.0.tar.gz", hash = "sha256:14d920b48472ea0dbf68e45b96cd1ffda4705f33307dcc86c676c1b5104838a6" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2f/de/afa024cbe022b1b318a3d224125aa24939e99b4ff6f22e0ba639a2eaee47/pytest-8.4.0-py3-none-any.whl", hash = "sha256:f40f825768ad76c0977cbacdf1fd37c6f7a468e460ea6a0636078f8972d4517e", size = 363797, upload-time = "2025-06-02T17:36:27.859Z" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/2f/de/afa024cbe022b1b318a3d224125aa24939e99b4ff6f22e0ba639a2eaee47/pytest-8.4.0-py3-none-any.whl", hash = "sha256:f40f825768ad76c0977cbacdf1fd37c6f7a468e460ea6a0636078f8972d4517e" },
 ]
 
 [[package]]
@@ -1733,8 +1733,8 @@ resolution-markers = [
     "python_full_version == '3.9.*'",
 ]
 dependencies = [
-    { name = "pytest", version = "8.4.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "pytest", version = "8.4.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version == '3.9.*'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/d0/d4/14f53324cb1a6381bef29d698987625d80052bb33932d8e7cbf9b337b17c/pytest_asyncio-1.0.0.tar.gz", hash = "sha256:d15463d13f4456e1ead2594520216b225a16f781e144f8fdf6c5bb4667c48b3f" }
 wheels = [
@@ -1747,7 +1747,7 @@ version = "2.1.0"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "pytest", version = "8.3.5", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "pytest", version = "8.4.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "pytest", version = "8.4.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "requests" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ae/1a/b64ac368de6b993135cb70ca4e5d958a5c268094a3a2a4cac6f0021b6c4f/pytest_base_url-2.1.0.tar.gz", hash = "sha256:02748589a54f9e63fcbe62301d6b0496da0d10231b753e950c63e03aee745d45" }
@@ -1762,7 +1762,7 @@ source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
     { name = "playwright" },
     { name = "pytest", version = "8.3.5", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "pytest", version = "8.4.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "pytest", version = "8.4.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "pytest-base-url" },
     { name = "python-slugify" },
 ]
@@ -1871,7 +1871,7 @@ dependencies = [
     { name = "pythonnet", marker = "sys_platform == 'win32'" },
     { name = "qtpy", marker = "sys_platform == 'openbsd6'" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/7a/c7/645f3b0bb190bf58c5cea9cfbcaa337ce3b54531ad207d3748676eb8cdc9/pywebview-5.4.tar.gz", hash = "sha256:b5e2c6c7502aaf72a9ae6034daf83785f5fad874fac7fa82bf4fcf854f1f083a" }
 wheels = [
@@ -1965,7 +1965,7 @@ dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/a1/53/830aa4c3066a8ab0ae9a9955976fb770fe9c6102117c8ec4ab3ea62d89e8/rich-14.0.0.tar.gz", hash = "sha256:82f1bc23a6a21ebca4ae0c45af9bdbc492ed20231dcb63f297d6d1021a9d5725" }
 wheels = [
@@ -1981,7 +1981,7 @@ dependencies = [
     { name = "click", version = "8.2.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "rich" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/5b/7a/cb48b7024b247631ce39b1f14a0f1abedf311fb27b892b0e0387d809d4b5/rich_toolkit-0.14.7.tar.gz", hash = "sha256:6cca5a68850cc5778915f528eb785662c27ba3b4b2624612cce8340fa9701c5e" }
 wheels = [
@@ -2068,7 +2068,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "anyio", version = "4.9.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version == '3.9.*'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/ce/20/08dfcd9c983f6a6f4a1000d934b9e6d626cff8d2eeb77a89a68eef20a2b7/starlette-0.46.2.tar.gz", hash = "sha256:7f7361f34eed179294600af672f565727419830b54b7b084efe44bb82d2fccd5" }
 wheels = [
@@ -2123,7 +2123,7 @@ dependencies = [
     { name = "rich" },
     { name = "shellingham" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/c5/8c/7d682431efca5fd290017663ea4588bf6f2c6aad085c7f108c5dbc316e70/typer-0.16.0.tar.gz", hash = "sha256:af377ffaee1dbe37ae9440cb4e8f11686ea5ce4e9bae01b84ae7c63b87f1dd3b" }
 wheels = [
@@ -2145,16 +2145,16 @@ wheels = [
 [[package]]
 name = "typing-extensions"
 version = "4.14.0"
-source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 resolution-markers = [
     "python_full_version >= '3.12'",
     "python_full_version == '3.11.*'",
     "python_full_version == '3.10.*'",
     "python_full_version == '3.9.*'",
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/d1/bc/51647cd02527e87d05cb083ccc402f93e441606ff1f01739a62c8ad09ba5/typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4", size = 107423, upload-time = "2025-06-02T14:52:11.399Z" }
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/d1/bc/51647cd02527e87d05cb083ccc402f93e441606ff1f01739a62c8ad09ba5/typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/69/e0/552843e0d356fbb5256d21449fa957fa4eff3bbc135a74a691ee70c7c5da/typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af", size = 43839, upload-time = "2025-06-02T14:52:10.026Z" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/69/e0/552843e0d356fbb5256d21449fa957fa4eff3bbc135a74a691ee70c7c5da/typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af" },
 ]
 
 [[package]]
@@ -2162,7 +2162,7 @@ name = "typing-inspection"
 version = "0.4.1"
 source = { registry = "https://mirrors.aliyun.com/pypi/simple" }
 dependencies = [
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/f8/b1/0c11f5058406b3af7609f121aaa6b609744687f1d158b3c3a5bf4cc94238/typing_inspection-0.4.1.tar.gz", hash = "sha256:6ae134cc0203c33377d43188d4064e9b357dba58cff3185f22924610e70a9d28" }
 wheels = [
@@ -2247,7 +2247,7 @@ dependencies = [
     { name = "click", version = "8.1.8", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "click", version = "8.2.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "h11", marker = "python_full_version >= '3.9'" },
-    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
+    { name = "typing-extensions", version = "4.14.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
 ]
 sdist = { url = "https://mirrors.aliyun.com/pypi/packages/de/ad/713be230bcda622eaa35c28f0d328c3675c371238470abdea52417f17a8e/uvicorn-0.34.3.tar.gz", hash = "sha256:35919a9a979d7a59334b6b10e05d77c1d0d574c50e0fc98b8b1a0f165708b55a" }
 wheels = [
