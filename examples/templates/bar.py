@@ -25,11 +25,26 @@ _extend_options = {
 def bar_options(
     source: QueryableMixin,
     *,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    x: str,
+    y: str,
+    groupId: Optional[str] = None,
+    subGroupId: Optional[str] = None,
     agg="avg",
 ):
-    sql = f"SELECT {x}, ROUND({agg}({y}),2) as {y} FROM {source} GROUP BY {x} ORDER BY {x} ASC"
+    select_exprs = [
+        x,
+        f"ROUND({agg}({y}),2) as {y}",
+    ]
+    group_by_exprs = [x]
+
+    if groupId:
+        select_exprs.append(f"{groupId} as groupId")
+        group_by_exprs.append(groupId)
+    if subGroupId:
+        select_exprs.append(f"{subGroupId} as subGroupId")
+        group_by_exprs.append(subGroupId)
+
+    sql = f"SELECT {', '.join(select_exprs)} FROM {source} GROUP BY {', '.join(group_by_exprs)} ORDER BY {x} ASC"
 
     opt = ui.js_computed(
         inputs=[pybi.query(sql), x, y, _extend_options],

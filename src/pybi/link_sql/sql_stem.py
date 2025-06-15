@@ -1,8 +1,9 @@
 from contextvars import ContextVar
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional, Set
+from pybi.link_sql._mixin import DataSetMixin
 from pybi.link_sql.systems.graph_system import topological_sort_kahn
-from pybi.link_sql import _const
+from pybi.link_sql import _const, _types
 
 view_id_count: ContextVar[int] = ContextVar("view_id_count", default=0)
 query_id_count: ContextVar[int] = ContextVar("query_id_count", default=0)
@@ -35,7 +36,23 @@ def extract_names(sql: str):
     return list(set(m.group() for m in _name_pattern.finditer(sql)))
 
 
-def extract_any_view_name(sql: str, sql_map: Dict[str, str]):
+def get_upstream_dataview_names(target_name: str, sql_map: _types.TSqlMap):
+    stack = [target_name]
+    views: Set[str] = set()
+
+    while stack:
+        name = stack.pop()
+        if get_source_type(name) == "view":
+            views.add(name)
+        sql = sql_map[name]["sql"]
+        stack.extend(
+            name for name in extract_names(sql) if get_source_type(name) == "view"
+        )
+
+    return list(views)
+
+
+def extract_any_view_name(sql: str, sql_map: _types.TSqlMap):
     stack = [sql]
 
     while stack:
@@ -44,13 +61,13 @@ def extract_any_view_name(sql: str, sql_map: Dict[str, str]):
             if get_source_type(name) == "view":
                 return name
 
-            stack.append(sql_map[name])
+            stack.append(sql_map[name]["sql"])
 
     raise ValueError(f"No view name found in sql[{sql}]")
 
 
-def get_sql_execution_order(sql_map: Dict[str, str]):
-    graph = {name: extract_names(sql) for name, sql in sql_map.items()}
+def get_sql_execution_order(sql_map: _types.TSqlMap):
+    graph = {name: extract_names(value["sql"]) for name, value in sql_map.items()}
     return topological_sort_kahn(graph)
 
 

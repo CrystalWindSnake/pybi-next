@@ -30,11 +30,9 @@ class DataViewColumn(
         return "view"
 
     def _to_element_binding_config(self) -> Dict:
-        self.__source.source._mark_used()
         return self.__source.flat_values()._to_element_binding_config()
 
     def _to_observable_config(self):
-        self.__source.source._mark_used()
         return self.__source.flat_values()._to_observable_config()
 
     def flat_values(
@@ -59,11 +57,9 @@ class DataQueryColumn(
         self.__source = _server_query.create_source(self._sql)
 
     def _to_element_binding_config(self) -> Dict:
-        self.__source.source._mark_used()
         return self.__source.flat_values()._to_element_binding_config()
 
     def _to_observable_config(self):
-        self.__source.source._mark_used()
         return self.__source.flat_values()._to_observable_config()
 
     def flat_values(

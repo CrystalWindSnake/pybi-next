@@ -64,7 +64,7 @@ class DataSetMixin(ABC):
 
 class DataTableMixin(ABC):
     @abstractmethod
-    def get_query_sql(self) -> str:
+    def get_query_name(self) -> str:
         pass
 
     @property

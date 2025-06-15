@@ -10,10 +10,10 @@ def table(
     query: DataTableMixin,
     **kwargs: Unpack[component_types.TTable],
 ):
-    sql = query.get_query_sql()
+    query_name = query.get_query_name()
     dataset_id = query.dataset_id
 
-    source_from_server = _server_query.create_source(sql, dataset_id=dataset_id)
+    source_from_server = _server_query.create_source(query_name, dataset_id=dataset_id)
 
     info = ui.js_computed(
         inputs=[source_from_server.source],

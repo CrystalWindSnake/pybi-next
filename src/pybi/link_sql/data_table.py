@@ -16,7 +16,7 @@ class DataViewTable(DataTableMixin):
         self.__dataset_id = data_view.dataset_id
         self.__fields = fields or []
 
-    def get_query_sql(self) -> str:
+    def get_query_name(self) -> str:
         return f'SELECT {", ".join(self.__fields)} FROM {self.__source_name}'
 
     @property
@@ -36,7 +36,7 @@ class DataQueryTable(DataTableMixin):
         self.__source_name = query.name
         self.__fields = fields or []
 
-    def get_query_sql(self) -> str:
+    def get_query_name(self) -> str:
         return f'SELECT {", ".join(self.__fields)} FROM {self.__source_name}'
 
     @property

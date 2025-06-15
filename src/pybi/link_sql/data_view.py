@@ -26,7 +26,9 @@ class DataView(QueryableMixin, ElementBindingMixin, ObservableMixin, DataTableMi
         self._dataset_id = self.__try_get_dataset_id(dataset, sql)
 
         self.__source = _server_query.create_source(
-            sql, dataset_id=self._dataset_id, exclude_filter_view_name=self.__name
+            self.__name,
+            dataset_id=self._dataset_id,
+            exclude_filter_view_name=self.__name,
         )
 
     def __try_get_dataset_id(self, dataset: Optional[DataSetMixin], sql: str):
@@ -78,8 +80,8 @@ class DataView(QueryableMixin, ElementBindingMixin, ObservableMixin, DataTableMi
     def __str__(self) -> str:
         return self.name
 
-    def get_query_sql(self) -> str:
-        return self.__sql
+    def get_query_name(self) -> str:
+        return self.name
 
     @property
     def source_name(self) -> str:

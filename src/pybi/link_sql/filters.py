@@ -12,14 +12,10 @@ def get_related_filters(
 ):
     store = get_store()
 
-    orders = sql_stem.get_sql_execution_order(store._sql_map)
-    source_level = orders[source_name]
+    # orders = sql_stem.get_sql_execution_order(store._sql_map)
+    # source_level = orders[source_name]
 
-    views = [
-        name
-        for name, level in orders.items()
-        if level > source_level and sql_stem.get_source_type(name) == "view"
-    ]
+    views = sql_stem.get_upstream_dataview_names(source_name, store._sql_map)
     filters = [store.get_filters(name) for name in views]
 
     aggregate_filter = ui.js_computed(
@@ -42,3 +38,42 @@ def get_related_filters(
     )
 
     return aggregate_filter
+
+
+def add_filter_js_fn():
+    """
+
+    Example:
+    .. code-block:: python
+
+        dv1_filters = dev.query_map().get_filters(dv1)
+
+        add_f1 = ui.js_event(
+            inputs=[dv1_filters, pybi.add_filter_js_fn()],
+            outputs=[dv1_filters],
+            code=r''' (filters, add_filter)=>{
+        return add_filter(filters, 'f1', {expr: 'Name = ?', value: 'foo1'})
+    }''',
+        )
+    """
+    return get_store()._add_filters_js_handler
+
+
+def remove_filter_js_fn():
+    """
+
+    Example:
+    .. code-block:: python
+
+        dv1_filters = dev.query_map().get_filters(dv1)
+
+        add_f1 = ui.js_event(
+            inputs=[dv1_filters, pybi.remove_filter_js_fn()],
+            outputs=[dv1_filters],
+            code=r''' (filters, remove_filter)=>{
+        return remove_filter(filters, 'f1')
+    }''',
+        )
+    """
+
+    return get_store()._remove_filters_js_handler
