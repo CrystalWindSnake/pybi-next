@@ -1,6 +1,4 @@
 from typing import Optional
-from instaui import ui
-import pybi
 from pybi.components.echarts import EChartsOption
 from pybi.link_sql._mixin import QueryableMixin
 
@@ -46,22 +44,22 @@ def bar_options(
 
     sql = f"SELECT {', '.join(select_exprs)} FROM {source} GROUP BY {', '.join(group_by_exprs)} ORDER BY {x} ASC"
 
-    opt = ui.js_computed(
-        inputs=[pybi.query(sql), x, y, _extend_options],
-        code=r"""(query_result, x,y,extend_options)=>{
+    option_fn_code = r"""(query_result, x,y,extend_options)=>{
         const source = [query_result.columns,...query_result.values]
         const {series_options, ...others_options} = extend_options
         
         return {
             ...others_options,
-            dataset: {source},
+            dataset: {dimensions:[x,y,'groupId', 'subGroupId'],source},
             series: [{
                     ...series_options,
                     type: 'bar',
-                    encode: {x,y},
+                    encode: {x,y,itemGroupId: "groupId",itemChildGroupId: "subGroupId"},
+                    universalTransition: {"enabled": true, "divideShape": "clone"},
                 }]
         }
-    }""",
-    )
+    }"""
 
-    return EChartsOption(opt)
+    return EChartsOption(
+        sql=sql, option_fn_code=option_fn_code, args=[x, y, _extend_options]
+    )

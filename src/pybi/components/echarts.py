@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from instaui import ui
 from instaui.vars.mixin_types.element_binding import ElementBindingMixin
 from pybi.link_sql._server_query import create_chart_source
+from pybi.systems import lazy_system
 
 
 class EChartsOptionMixin(ABC):
@@ -39,22 +40,32 @@ def echarts(option: EChartsOptionMixin):
 class EChartsOption(EChartsOptionMixin):
     def __init__(
         self,
-        computed_option: ElementBindingMixin,
         *,
-        sql: Optional[str] = None,
-        option_fn: Optional[ui.js_fn] = None,
+        sql: str,
+        option_fn_code: str,
         args: Optional[Sequence] = None,
     ) -> None:
-        self.__computed_option = computed_option
         self._sql = sql
-        self._option_fn = option_fn
+        self._option_fn_code = option_fn_code
         self._args = args
+
+        def builder():
+            info = create_chart_source([self._sql])
+            fn = ui.js_fn(self._option_fn_code)
+            opt = ui.js_computed(
+                inputs=[info.source, fn, *(self._args or [])],
+                code=r"""(query_result, fn, ...args) => fn(query_result, ...args)""",
+            )
+
+            return opt
+
+        self._computed_option_getter = lazy_system.lazy_task(builder)
 
     def __add__(self, other: EChartsOption) -> EChartsDrilldownOption:
         return EChartsDrilldownOption([self, other])
 
     def get_option(self) -> ElementBindingMixin:
-        return self.__computed_option
+        return self._computed_option_getter()
 
 
 class EChartsDrilldownOption(EChartsOptionMixin):
@@ -85,9 +96,7 @@ class EChartsDrilldownOption(EChartsOptionMixin):
 
     def get_option(self) -> ElementBindingMixin:
         sqls = [option._sql for option in self.__echarts_options if option._sql]
-        js_fns = [
-            option._option_fn for option in self.__echarts_options if option._option_fn
-        ]
+        js_fns = [ui.js_fn(option._option_fn_code) for option in self.__echarts_options]
         fn_args_array = [
             option._args for option in self.__echarts_options if option._args
         ]
