@@ -3,8 +3,7 @@ import typing
 from instaui import ui
 from pybi.link_sql.data_set_store import get_data_set
 from pybi.link_sql.data_view_store import get_store as get_view_store, Store
-from pybi.link_sql.filters import get_related_filters
-from pybi.link_sql import sql_stem
+from pybi.link_sql import _types, sql_stem
 from dataclasses import dataclass
 
 
@@ -12,18 +11,13 @@ def create_source(
     query_name: str,
     *,
     dataset_id: typing.Optional[int] = None,
-    exclude_filter_view_name: typing.Optional[str] = None,
-    exclude_filter_query_key: typing.Optional[str] = None,
+    exclude_filter: typing.Optional[_types.TExcludeFilter] = None,
 ) -> SourceInfo:
     store = get_view_store()
 
     dataset_id = _get_dataset_id(store, query_name, dataset_id)
 
-    filters = get_related_filters(
-        query_name,
-        target_view=exclude_filter_view_name,
-        query_key=exclude_filter_query_key,
-    )
+    filters = store.build_related_filters(query_name, exclude_filter=exclude_filter)
 
     info = {
         "main_query": query_name,
@@ -40,8 +34,8 @@ def create_source(
     )
     def source_from_server(
         info: typing.Dict,
-        filters: typing.Dict,
-        sql_map: typing.Dict[str, str],
+        filters: typing.Any,
+        sql_map: typing.Dict[str, typing.Any],
         sql_orders: typing.Dict[str, int],
     ):
         sql, params = sql_stem.build_sql(
@@ -72,6 +66,14 @@ class SourceInfo:
             code=r"""source=>{
     const {values} = source
     return values.flat()                      
+}""",
+        )
+
+    def values(self):
+        return ui.js_computed(
+            inputs=[self.source],
+            code=r"""source=>{
+    return source.values
 }""",
         )
 
@@ -112,15 +114,13 @@ def create_chart_source(
     *,
     current_query_index=0,
     dataset_id: typing.Optional[int] = None,
-    exclude_filter_view_name: typing.Optional[str] = None,
-    exclude_filter_query_key: typing.Optional[str] = None,
+    exclude_filter: typing.Optional[_types.TExcludeFilter] = None,
 ) -> ChartSourceInfo:
     info, query_index = _create_chart_infos(
         sqls,
         current_query_index,
         dataset_id,
-        exclude_filter_view_name,
-        exclude_filter_query_key,
+        exclude_filter,
     )
 
     store = get_view_store()
@@ -136,7 +136,7 @@ def create_chart_source(
     def source_from_server(
         info: typing.Dict,
         query_index: int,
-        sql_map: typing.Dict[str, str],
+        sql_map: typing.Dict[str, _types.TSqlMapValue],
         sql_orders: typing.Dict[str, int],
     ):
         main_query_name = info["query"]
@@ -160,8 +160,7 @@ def _create_chart_infos(
     sqls: typing.Iterable[str],
     current_query_index: int,
     dataset_id: typing.Optional[int] = None,
-    exclude_filter_view_name: typing.Optional[str] = None,
-    exclude_filter_query_key: typing.Optional[str] = None,
+    exclude_filter: typing.Optional[_types.TExcludeFilter] = None,
 ):
     current_query_index_state = ui.state(current_query_index)
     query_names = []
@@ -169,17 +168,12 @@ def _create_chart_infos(
     dataset_id_list = []
 
     for sql in sqls:
-        query_name = sql_stem.gen_query_name()
         store = get_view_store()
-        store.store_query(query_name, sql)
+        query_name = store.store_query(sql)
 
-        dataset_id = _get_dataset_id(store, sql, dataset_id)
+        dataset_id = _get_dataset_id(store, query_name, dataset_id)
 
-        filters = get_related_filters(
-            query_name,
-            target_view=exclude_filter_view_name,
-            query_key=exclude_filter_query_key,
-        )
+        filters = store.build_related_filters(query_name, exclude_filter=exclude_filter)
 
         query_names.append(query_name)
         filters_list.append(filters)

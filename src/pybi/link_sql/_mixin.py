@@ -39,12 +39,6 @@ class QueryResultMixin(ABC):
     def flat_values(self) -> ui.TMaybeRef[List[Any]]:
         pass
 
-    # def values(self):
-    #     return self.result["values"]
-
-    # def columns(self):
-    #     return self.result["columns"]
-
 
 class DataSetQueryInfo(TypedDict, total=False):
     columns: List[str]
@@ -81,6 +75,14 @@ class DataTableMixin(ABC):
     def get_source_type(self) -> _const.TSourceType:
         pass
 
+    @abstractmethod
+    def flat_values(self):
+        pass
+
+    @abstractmethod
+    def values(self):
+        pass
+
 
 class DataColumnMixin(ABC):
     @property
@@ -98,5 +100,9 @@ class DataColumnMixin(ABC):
         pass
 
     @abstractmethod
-    def distinct(self) -> List:
+    def distinct(self):
+        pass
+
+    @abstractmethod
+    def flat_values(self):
         pass

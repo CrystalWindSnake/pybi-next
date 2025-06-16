@@ -5,7 +5,6 @@ from pybi.link_sql import _mixin
 from pybi.link_sql.data_column import DataQueryColumn
 from pybi.link_sql.data_table import DataQueryTable
 from pybi.link_sql import _server_query
-from pybi.link_sql import sql_stem
 from pybi.link_sql.data_view_store import get_store as _get_store
 
 
@@ -20,8 +19,7 @@ class Query(
         self, sql: str, *, dataset: typing.Optional[_mixin.DataSetMixin] = None
     ) -> None:
         self.__sql = sql
-        self.__name = sql_stem.gen_view_name()
-        _get_store().store_query(self.__name, sql)
+        self.__name = _get_store().store_query(sql)
         # self._dataset_id = self.__try_get_dataset_id(dataset, sql)
 
         self.__dataset_id = dataset.get_id() if dataset else None
@@ -82,6 +80,9 @@ class Query(
 
     def get_source_type(self):
         return "query"
+
+    def values(self):
+        return self.__server_info.flat_values()
 
 
 query = Query

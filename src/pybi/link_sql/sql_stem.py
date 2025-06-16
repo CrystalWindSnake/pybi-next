@@ -1,7 +1,6 @@
 from contextvars import ContextVar
 import re
-from typing import Dict, List, Optional, Set
-from pybi.link_sql._mixin import DataSetMixin
+from typing import Dict, List, Set
 from pybi.link_sql.systems.graph_system import topological_sort_kahn
 from pybi.link_sql import _const, _types
 
@@ -74,29 +73,31 @@ def get_sql_execution_order(sql_map: _types.TSqlMap):
 def build_sql(
     *,
     main_query_name: str,
-    filters: Dict,
-    sql_map: Dict[str, str],
+    filters: List,
+    sql_map: Dict[str, _types.TSqlMapValue],
     sql_orders: Dict[str, int],
 ):
     """
     main_query_name='@_q1_@',
-    filters={'@_v1_@': {'name-1': {'expr': 'name in ?', 'value': ['xxx']}}},
-    sql_map={'@_v1_@': 'select * from df', '@_q1_@': 'SELECT DISTINCT name FROM @_v1_@'},
+    filters=[{'view': "'@_v3_@'", 'filters': {'f1': {'expr': 'Name = ?', 'value': 'foo1'}}}, {'view': "'@_v1_@'", 'filters': {}}],
+    sql_map={'@_v1_@': {'sql':'select * from df',}, '@_q1_@': 'SELECT DISTINCT name FROM @_v1_@'},
     sql_orders=['@_v1_@' :2, '@_q1_@':1]
     """
+
+    view2filters = {f["view"]: f["filters"] for f in filters}
 
     orders_without_main = _get_orders_without_main(sql_orders, main_query_name)
     params = []
 
     cte_query = [
-        f"{name} AS ({_sql_with_filters(name, filters, sql_map=sql_map,params=params)})"
+        f"{name} AS ({_sql_with_filters(name, view2filters, sql_map=sql_map,params=params)})"
         for name in orders_without_main
     ]
 
     cte_stem = "WITH " + ", ".join(cte_query) if cte_query else ""
 
     return (
-        f"{cte_stem}{_sql_with_filters(main_query_name, filters, sql_map=sql_map,params=params)}",
+        f"{cte_stem}{_sql_with_filters(main_query_name, view2filters, sql_map=sql_map,params=params)}",
         params,
     )
 
@@ -107,7 +108,7 @@ def _get_orders_without_main(sql_orders: Dict[str, int], target_query_name: str)
 
 
 def _sql_with_filters(
-    name: str, filters: Dict, *, sql_map: Dict[str, str], params: List
+    name: str, filters: Dict, *, sql_map: Dict[str, _types.TSqlMapValue], params: List
 ) -> str:
     filter = filters.get(name, {})
     where_stem = ""
@@ -115,7 +116,7 @@ def _sql_with_filters(
         where_stem = " WHERE " + " AND ".join(v["expr"] for v in filter.values())
         params.extend(v["value"] for v in filter.values())
 
-    sql = sql_map[name]
+    sql = sql_map[name]["sql"]
     if not where_stem:
         return sql
 
