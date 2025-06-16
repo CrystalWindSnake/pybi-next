@@ -87,7 +87,7 @@ def _get_dataset_id(
     any_view_name = sql_stem.extract_any_view_name(
         view_store.get_sql(query_name), view_store.server_sql_map
     )
-    return view_store.get_view(any_view_name).dataset_id
+    return view_store.get_view_dataset_id(any_view_name)
 
 
 @dataclass(frozen=True)
@@ -169,7 +169,7 @@ def _create_chart_infos(
 
     for sql in sqls:
         store = get_view_store()
-        query_name = store.store_query(sql)
+        query_name = store.gen_query(sql)
 
         dataset_id = _get_dataset_id(store, query_name, dataset_id)
 

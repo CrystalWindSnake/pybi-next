@@ -19,7 +19,7 @@ class Query(
         self, sql: str, *, dataset: typing.Optional[_mixin.DataSetMixin] = None
     ) -> None:
         self.__sql = sql
-        self.__name = _get_store().store_query(sql)
+        self.__name = _get_store().gen_query(sql)
         # self._dataset_id = self.__try_get_dataset_id(dataset, sql)
 
         self.__dataset_id = dataset.get_id() if dataset else None

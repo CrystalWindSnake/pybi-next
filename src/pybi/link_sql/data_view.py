@@ -21,9 +21,9 @@ from pybi.link_sql._mixin import (
 class DataView(QueryableMixin, ElementBindingMixin, ObservableMixin, DataTableMixin):
     def __init__(self, sql: str, *, dataset: Optional[DataSetMixin] = None):
         self.__sql = sql
-        self.__name = sql_stem.gen_view_name()
-        _get_store().store_view(self, sql)
+
         self._dataset_id = self.__try_get_dataset_id(dataset, sql)
+        self.__name = _get_store().gen_view(sql, self._dataset_id)
 
         self.__source = _server_query.create_source(
             self.__name,
@@ -34,7 +34,7 @@ class DataView(QueryableMixin, ElementBindingMixin, ObservableMixin, DataTableMi
         if dataset is None:
             for name in sql_stem.iter_extract_names(sql):
                 if sql_stem.get_source_type(name) == "view":
-                    return _get_store().get_view(name).dataset_id
+                    return _get_store().get_view_dataset_id(name)
 
             raise ValueError("dataset is None and no view found in sql")
 

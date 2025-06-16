@@ -15,7 +15,7 @@ class DataViewColumn(
         self._source_name = source_name
         self.__field = field
 
-        query_name = get_store().store_query(f"SELECT {field} FROM {source_name}")
+        query_name = get_store().gen_query(f"SELECT {field} FROM {source_name}")
         self.__source = _server_query.create_source(query_name)
 
     @property
@@ -41,7 +41,7 @@ class DataViewColumn(
         return self.__source.flat_values()
 
     def distinct(self):
-        query_name = get_store().store_query(
+        query_name = get_store().gen_query(
             f"SELECT DISTINCT {self.field} FROM {self.source_name}"
         )
         return _server_query.create_source(query_name).flat_values()
@@ -55,7 +55,7 @@ class DataQueryColumn(
         self.__field = field
         self._sql = f"SELECT {field} FROM {source_name}"
 
-        query_name = get_store().store_query(self._sql)
+        query_name = get_store().gen_query(self._sql)
         self.__source = _server_query.create_source(query_name)
 
     def _to_element_binding_config(self) -> Dict:

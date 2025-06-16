@@ -17,7 +17,7 @@ class DataViewTable(DataTableMixin, ObservableMixin, ElementBindingMixin):
     ) -> None:
         if fields:
             sql = f"SELECT {', '.join(fields)} FROM {data_view.name}"
-            query_name = get_store().store_query(sql)
+            query_name = get_store().gen_query(sql)
         else:
             query_name = data_view.name
 
@@ -57,7 +57,7 @@ class DataQueryTable(DataTableMixin, ObservableMixin, ElementBindingMixin):
     def __init__(self, query: Query, fields: Optional[Sequence[str]] = None) -> None:
         if fields:
             sql = f"SELECT {', '.join(fields)} FROM {query.name}"
-            query_name = get_store().store_query(sql)
+            query_name = get_store().gen_query(sql)
         else:
             query_name = query.name
 

@@ -7,8 +7,6 @@ from collections import defaultdict
 from pybi.link_sql import sql_stem
 from pybi.link_sql import _types
 
-if TYPE_CHECKING:
-    from pybi.link_sql.data_view import DataView
 
 _TViewName = str
 
@@ -26,7 +24,7 @@ class Store(Element, esm="./data_view_store.js"):
         self.sql_orders = ui.data({})
         self.sql_map: _types.TSqlMap = ui.state({})
         self._field_query_id_count: Dict[str, int] = defaultdict(lambda: 0)
-        self._view_obj_map: Dict[_TViewName, DataView] = {}
+        self._view_dataset_id_map: Dict[_TViewName, int] = {}
 
         self._element_ref = ui.element_ref()
         self.element_ref(self._element_ref)
@@ -61,13 +59,15 @@ class Store(Element, esm="./data_view_store.js"):
         self._field_query_id_count[field] += 1
         return self._field_query_id_count[field]
 
-    def store_view(self, view: DataView, sql: str):
-        self._sql_map[view.name] = {
+    def gen_view(self, sql: str, dataset_id: int):
+        view_name = sql_stem.gen_view_name()
+        self._sql_map[view_name] = {
             "sql": sql,
             "filters": {},
             "parents": sql_stem.extract_names(sql),
         }
-        self._view_obj_map[view.name] = view
+        self._view_dataset_id_map[view_name] = dataset_id
+        return view_name
 
     def build_related_filters(
         self,
@@ -101,10 +101,10 @@ class Store(Element, esm="./data_view_store.js"):
 
         return data
 
-    def get_view(self, view_name: str) -> DataView:
-        return self._view_obj_map[view_name]
+    def get_view_dataset_id(self, view_name: str) -> int:
+        return self._view_dataset_id_map[view_name]
 
-    def store_query(self, sql: str):
+    def gen_query(self, sql: str):
         query_name = sql_stem.gen_query_name()
         self._sql_map[query_name] = {
             "sql": sql,

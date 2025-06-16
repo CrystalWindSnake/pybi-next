@@ -28,7 +28,7 @@ def select(
             "query_key": f"{field}-{store.gen_field_query_id(field)}",
         }
 
-    query_name = store.store_query(
+    query_name = store.gen_query(
         f"SELECT DISTINCT {field} FROM {source_name} ORDER BY {field} ASC"
     )
 
