@@ -1,7 +1,7 @@
 from contextvars import ContextVar
 import re
 from typing import Dict, List, Set
-from pybi.link_sql.systems.graph_system import topological_sort_kahn
+from pybi.systems.graph_system import topological_sort_kahn
 from pybi.link_sql import _const, _types
 
 view_id_count: ContextVar[int] = ContextVar("view_id_count", default=0)
