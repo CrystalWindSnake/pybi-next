@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict
+from typing import Dict, Literal, Optional
 from instaui.vars.mixin_types.element_binding import ElementBindingMixin
 from instaui.vars.mixin_types.observable import ObservableMixin
 
@@ -40,10 +40,9 @@ class DataViewColumn(
     ):
         return self.__source.flat_values()
 
-    def distinct(self):
-        query_name = get_store().gen_query(
-            f"SELECT DISTINCT {self.field} FROM {self.source_name}"
-        )
+    def distinct(self, *, order_by: Optional[Literal["ASC", "DESC"]] = None):
+        sql = f"SELECT DISTINCT {self.field} FROM {self.source_name}{f' ORDER BY {self.field} {order_by}' if order_by else ''}"
+        query_name = get_store().gen_query(sql)
         return _server_query.create_source(query_name).flat_values()
 
 
@@ -80,8 +79,7 @@ class DataQueryColumn(
     def get_source_type(self):
         return "query"
 
-    def distinct(self):
-        query_name = get_store().gen_query(
-            f"SELECT DISTINCT {self.field} FROM {self.source_name}"
-        )
+    def distinct(self, *, order_by: Optional[Literal["ASC", "DESC"]] = None):
+        sql = f"SELECT DISTINCT {self.field} FROM {self.source_name}{f' ORDER BY {self.field} {order_by}' if order_by else ''}"
+        query_name = get_store().gen_query(sql)
         return _server_query.create_source(query_name).flat_values()

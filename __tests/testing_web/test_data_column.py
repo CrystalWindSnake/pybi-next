@@ -12,10 +12,10 @@ def test_distinct_from_data_view(context: Context, memory_db: MemoryDb):
     @context.register_page
     def index():
         dv1 = dataset["df"]
-        display.list_box(dv1["Name"].distinct())
+        display.list_box(dv1["Name"].distinct(order_by="ASC"))
 
     context.open()
-    ListBox(context).should_have_text(["foo", "bar"])
+    ListBox(context).should_have_text(["bar", "foo"])
 
 
 def test_distinct_from_query(context: Context, memory_db: MemoryDb):
@@ -26,10 +26,10 @@ def test_distinct_from_query(context: Context, memory_db: MemoryDb):
     def index():
         dv1 = dataset["df"]
         query = pybi.query(f"SELECT Name FROM {dv1}")
-        display.list_box(query["Name"].distinct())
+        display.list_box(query["Name"].distinct(order_by="ASC"))
 
     context.open()
-    ListBox(context).should_have_text(["foo", "bar"])
+    ListBox(context).should_have_text(["bar", "foo"])
 
 
 def test_flat_values_from_data_view(context: Context, memory_db: MemoryDb):

@@ -5,6 +5,7 @@ from typing import (
     Any,
     Dict,
     List,
+    Literal,
     Optional,
     Union,
     TypedDict,
@@ -105,7 +106,7 @@ class DataColumnMixin(ABC):
         pass
 
     @abstractmethod
-    def distinct(self) -> List:
+    def distinct(self, *, order_by: Optional[Literal["ASC", "DESC"]] = None) -> List:
         pass
 
     @abstractmethod
