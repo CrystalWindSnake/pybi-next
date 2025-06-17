@@ -1,8 +1,9 @@
+from typing import List, Union
 from instaui import html, ui
 from pybi.link_sql._mixin import DataColumnMixin, DataTableMixin
 
 
-def list_box(data: DataColumnMixin, classes: str = "pybi-test-list-box"):
+def list_box(data: Union[List, DataColumnMixin], classes: str = "pybi-test-list-box"):
     html.ul.from_list(data).classes(classes)
 
 

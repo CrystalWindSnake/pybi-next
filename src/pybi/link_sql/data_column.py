@@ -81,6 +81,7 @@ class DataQueryColumn(
         return "query"
 
     def distinct(self):
-        return _server_query.create_source(
-            f"SELECT DISTINCT {self.field} FROM {self.source_name}",
-        ).flat_values()
+        query_name = get_store().gen_query(
+            f"SELECT DISTINCT {self.field} FROM {self.source_name}"
+        )
+        return _server_query.create_source(query_name).flat_values()
