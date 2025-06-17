@@ -1,7 +1,7 @@
 import pybi
 from instaui import ui
 import pandas as pd
-from templates.bar import bar_options
+from templates import make_bar, make_line, make_pie
 
 
 data = {
@@ -53,8 +53,15 @@ def index():
         f"SELECT name, ROUND(avg(Age),2) as Age FROM {table} GROUP BY name",
     )
 
-    with pybi.grid(rows="30vh auto 1fr").classes("max-w-[800px] mx-auto gap-2"):
-        pybi.echarts(bar_options(table, x="name", y="age"))
+    with pybi.grid(columns=pybi.grid.auto_columns(min_width="20vw")).classes(
+        "min-h-[300px]"
+    ):
+        pybi.echarts(make_bar(table, x="Name", y="Age", agg="avg"))
+        pybi.echarts(make_line(table, x="Name", y="Age", agg="avg"))
+        pybi.echarts(make_pie(table, name="Class", value="Age", agg="sum"))
+
+    with pybi.grid().classes("max-w-[800px] mx-auto gap-2"):
+        # pybi.echarts(make_bar(table, x="name", y="age"))
         pybi.select(table["Class"])
         pybi.select(table["name"], multiple=True)
         pybi.table(gp_query)

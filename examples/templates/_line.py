@@ -4,7 +4,7 @@ from pybi.link_sql._mixin import QueryableMixin
 
 
 # https://echarts.apache.org/zh/option.html#series-bar
-_series_options = {"label": {"show": True, "align": "center"}}
+_series_options = {"label": {"show": True}}
 
 # https://echarts.apache.org/zh/option.html#xAxis
 _xAxis_options = {"axisLabel": {"rotate": 30}, "type": "category"}
@@ -20,7 +20,7 @@ _extend_options = {
 }
 
 
-def bar_options(
+def make_line(
     source: QueryableMixin,
     *,
     x: str,
@@ -44,22 +44,27 @@ def bar_options(
 
     sql = f"SELECT {', '.join(select_exprs)} FROM {source} GROUP BY {', '.join(group_by_exprs)} ORDER BY {x} ASC"
 
-    option_fn_code = r"""(query_result, x,y,extend_options)=>{
+    option_fn_code = r"""(query_result, groupId,subGroupId,x,y,extend_options)=>{
         const source = [query_result.columns,...query_result.values]
         const {series_options, ...others_options} = extend_options
+        const dimensions = [x,y, ...(groupId? ['groupId', 'subGroupId'] : [])]
+        const encode = {x,y, ...(groupId? {itemGroupId: "groupId",itemChildGroupId: "subGroupId"} : {})}
+        const universalTransition = groupId ? {"enabled": true, "divideShape": "clone"} : {}
         
         return {
             ...others_options,
-            dataset: {dimensions:[x,y,'groupId', 'subGroupId'],source},
+            dataset: {dimensions,source},
             series: [{
                     ...series_options,
-                    type: 'bar',
-                    encode: {x,y,itemGroupId: "groupId",itemChildGroupId: "subGroupId"},
-                    universalTransition: {"enabled": true, "divideShape": "clone"},
+                    type: 'line',
+                    encode,
+                    universalTransition,
                 }]
         }
     }"""
 
     return EChartsOption(
-        sql=sql, option_fn_code=option_fn_code, args=[x, y, _extend_options]
+        sql=sql,
+        option_fn_code=option_fn_code,
+        args=[groupId, subGroupId, x, y, _extend_options],
     )

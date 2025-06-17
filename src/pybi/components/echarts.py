@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Sequence, Union
+from typing import Dict, Optional, Sequence, Union
 from abc import ABC, abstractmethod
 from instaui import ui
 from instaui.vars.mixin_types.element_binding import ElementBindingMixin
@@ -13,8 +13,12 @@ class EChartsOptionMixin(ABC):
         pass
 
 
-def echarts(option: EChartsOptionMixin):
-    chart = ui.echarts(option.get_option())
+def echarts(option: Union[Dict, EChartsOptionMixin]):
+    chart_option = (
+        option.get_option() if isinstance(option, EChartsOptionMixin) else option
+    )
+
+    chart = ui.echarts(chart_option)
 
     if isinstance(option, EChartsDrilldownOption):
         max_level = option.level_count
