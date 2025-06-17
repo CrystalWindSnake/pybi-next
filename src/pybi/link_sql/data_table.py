@@ -52,6 +52,9 @@ class DataViewTable(DataTableMixin, ObservableMixin, ElementBindingMixin):
     def values(self):
         return self.__source.values()
 
+    def columns(self):
+        return self.__source.columns()
+
 
 class DataQueryTable(DataTableMixin, ObservableMixin, ElementBindingMixin):
     def __init__(self, query: Query, fields: Optional[Sequence[str]] = None) -> None:
@@ -91,3 +94,6 @@ class DataQueryTable(DataTableMixin, ObservableMixin, ElementBindingMixin):
 
     def values(self):
         return self.__source.values()
+
+    def columns(self):
+        return self.__source.columns()

@@ -77,11 +77,15 @@ class DataTableMixin(ABC):
         pass
 
     @abstractmethod
-    def flat_values(self):
+    def flat_values(self) -> List[Any]:
         pass
 
     @abstractmethod
-    def values(self):
+    def values(self) -> List[List[Any]]:
+        pass
+
+    @abstractmethod
+    def columns(self) -> List:
         pass
 
 

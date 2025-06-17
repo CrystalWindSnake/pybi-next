@@ -95,6 +95,9 @@ class DataView(QueryableMixin, ElementBindingMixin, ObservableMixin, DataTableMi
     def values(self):
         return self.__source.values()
 
+    def columns(self):
+        return self.__source.columns()
+
 
 def data_view(sql: str) -> DataView:
     return DataView(sql)

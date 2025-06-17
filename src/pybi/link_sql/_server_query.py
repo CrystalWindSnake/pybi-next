@@ -77,6 +77,14 @@ class SourceInfo:
 }""",
         )
 
+    def columns(self):
+        return ui.js_computed(
+            inputs=[self.source],
+            code=r"""source=>{
+    return source.columns
+}""",
+        )
+
 
 def _get_dataset_id(
     view_store: Store, query_name: str, dataset_id: typing.Optional[int] = None
