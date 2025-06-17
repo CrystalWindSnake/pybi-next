@@ -30,6 +30,9 @@ dev = [
 lint = [
     "ruff>=0.11.8",
 ]
+git = [
+    "pre-commit>=3.5.0",
+]
 
 [project.optional-dependencies]
 web = ["instaui[web]","duckdb>=1.2.2"]

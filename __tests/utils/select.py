@@ -52,9 +52,9 @@ class Select:
 
         real_texts = self.__page.locator(_OPTIONS_ITEM_SELECTOR).all_text_contents()
 
-        assert (
-            len(set(texts).difference(real_texts)) == 0
-        ), f"Expected texts {texts} not found in {real_texts}"
+        assert len(set(texts).difference(real_texts)) == 0, (
+            f"Expected texts {texts} not found in {real_texts}"
+        )
         return self
 
     def should_options_have_text_with_order(self, *texts: str):
@@ -107,4 +107,3 @@ class Select:
         self.open_options()
         selected_items = self.__page.locator(_OPTIONS_ITEM_SELECTED_SELECTOR)
         expect(selected_items).to_have_count(0)
-

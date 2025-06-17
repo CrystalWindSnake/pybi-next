@@ -90,14 +90,14 @@ def build_sql(
     params = []
 
     cte_query = [
-        f"{name} AS ({_sql_with_filters(name, view2filters, sql_map=sql_map,params=params)})"
+        f"{name} AS ({_sql_with_filters(name, view2filters, sql_map=sql_map, params=params)})"
         for name in orders_without_main
     ]
 
     cte_stem = "WITH " + ", ".join(cte_query) if cte_query else ""
 
     return (
-        f"{cte_stem}{_sql_with_filters(main_query_name, view2filters, sql_map=sql_map,params=params)}",
+        f"{cte_stem}{_sql_with_filters(main_query_name, view2filters, sql_map=sql_map, params=params)}",
         params,
     )
 

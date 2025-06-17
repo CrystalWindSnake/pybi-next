@@ -1,6 +1,5 @@
 from __tests.testing_web.context import Context
 from __tests.testing_web.memory_db import MemoryDb
-from instaui import ui
 import pandas as pd
 import pybi
 from __tests.utils import Select, display, ListBox

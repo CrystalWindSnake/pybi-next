@@ -1,4 +1,4 @@
-__all__ = ["Table", "Select" "ListBox" "GridCell"]
+__all__ = ["Table", "Select", "ListBox", "GridCell"]
 
 from .table import Table
 from .select import Select
