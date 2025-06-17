@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import (
     TYPE_CHECKING,
     Any,
+    Dict,
     List,
     Optional,
     Union,
@@ -100,9 +101,12 @@ class DataColumnMixin(ABC):
         pass
 
     @abstractmethod
-    def distinct(self):
+    def distinct(self) -> List:
         pass
 
     @abstractmethod
-    def flat_values(self):
+    def flat_values(self) -> List:
         pass
+
+    @abstractmethod
+    def _to_element_binding_config(self) -> Dict: ...

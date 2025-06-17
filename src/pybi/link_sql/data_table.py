@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence
 from instaui.vars.mixin_types.element_binding import ElementBindingMixin
 from instaui.vars.mixin_types.observable import ObservableMixin
 from ._mixin import DataTableMixin

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from contextvars import ContextVar
-from typing import Any, Dict, TYPE_CHECKING, Optional
+from typing import Any, Dict, Optional
 from instaui import ui
 from instaui.components.element import Element
 from collections import defaultdict
