@@ -1,13 +1,13 @@
 from __tests.testing_web.context import Context
+from __tests.testing_web.memory_db import MemoryDb
 import pandas as pd
 import pybi
 from __tests.utils import Table
 
 
-def test_base(context: Context):
+def test_base(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo", "foo", "bar"], "Age": [18, 19, 20]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():
@@ -20,10 +20,9 @@ def test_base(context: Context):
     Table(context).should_values_any_cell("18.5")
 
 
-def test_select_columns(context: Context):
+def test_select_columns(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo"], "Age": [18], "class": [1]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():

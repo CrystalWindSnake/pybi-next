@@ -1,14 +1,14 @@
 from __tests.testing_web.context import Context
+from __tests.testing_web.memory_db import MemoryDb
 from instaui import ui
 import pandas as pd
 import pybi
 from __tests.utils import Table, Select
 
 
-def test_base(context: Context):
+def test_base(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo", "foo", "bar"], "Age": [18, 19, 20]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():
@@ -21,10 +21,11 @@ def test_base(context: Context):
     Table(context).should_values_any_cell("18.5")
 
 
-def test_upstream_data_view_update_affects_downstream(context: Context):
+def test_upstream_data_view_update_affects_downstream(
+    context: Context, memory_db: MemoryDb
+):
     data = {"Name": ["foo", "foo", "bar"], "Age": [18, 19, 20]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():
@@ -47,10 +48,9 @@ def test_upstream_data_view_update_affects_downstream(context: Context):
     table.should_values_not_any_cell("bar")
 
 
-def test_selected_multiple_columns(context: Context):
+def test_selected_multiple_columns(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo"], "Age": [18], "class": [1]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():
@@ -65,10 +65,9 @@ def test_selected_multiple_columns(context: Context):
     table.should_values_not_any_cell("1")
 
 
-def test_computed_binding(context: Context):
+def test_computed_binding(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo", "bar"], "Age": [18, 19]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():
@@ -88,10 +87,9 @@ def test_computed_binding(context: Context):
     )
 
 
-def test_selected_column_computed_binding(context: Context):
+def test_selected_column_computed_binding(context: Context, memory_db: MemoryDb):
     data = {"Name": ["foo", "bar"]}
-
-    dataset = pybi.duckdb.from_pandas({"df": pd.DataFrame(data)})
+    dataset = memory_db.from_dataframe({"df": pd.DataFrame(data)})
 
     @context.register_page
     def index():

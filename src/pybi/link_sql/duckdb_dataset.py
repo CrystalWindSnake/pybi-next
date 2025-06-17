@@ -13,11 +13,14 @@ except ImportError as e:
 
 
 class DuckdbDataFrameDataSet(DataSetMixin):
-    def __init__(self, dataframes: Dict[str, "pandas.DataFrame"]):
+    def __init__(self, dataframes: Optional[Dict[str, "pandas.DataFrame"]] = None):
         super().__init__()
         self._conn = duckdb.connect(":default:", read_only=False)
         self._id = data_set_store.store_data_set(self)
 
+        self.import_dataframe(dataframes or {})
+
+    def import_dataframe(self, dataframes: Dict[str, "pandas.DataFrame"]):
         for name, df in dataframes.items():
             _dataframe_import_to_db(self._conn, df, name)
 
@@ -87,9 +90,9 @@ class Facade:
 
     @classmethod
     def from_pandas(
-        cls, dataframes_map: Dict[str, "pandas.DataFrame"]
+        cls, dataframes_map: Optional[Dict[str, "pandas.DataFrame"]] = None
     ) -> DuckdbDataFrameDataSet:
-        ds = DuckdbDataFrameDataSet(dataframes_map)
+        ds = DuckdbDataFrameDataSet(dataframes_map or {})
         return ds
 
 
