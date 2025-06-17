@@ -84,5 +84,8 @@ class Query(
     def values(self):
         return self.__server_info.flat_values()
 
+    def columns(self):
+        return self.__server_info.columns()
+
 
 query = Query

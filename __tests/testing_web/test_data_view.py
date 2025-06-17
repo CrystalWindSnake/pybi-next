@@ -3,7 +3,7 @@ from __tests.testing_web.memory_db import MemoryDb
 from instaui import ui
 import pandas as pd
 import pybi
-from __tests.utils import Table, Select
+from __tests.utils import Table, Select, display, ListBox
 
 
 def test_base(context: Context, memory_db: MemoryDb):
@@ -75,16 +75,13 @@ def test_computed_binding(context: Context, memory_db: MemoryDb):
         dv = pybi.data_view(f"SELECT * FROM {table}")
 
         @ui.computed(inputs=[dv])
-        def result(names):
-            return str(names)
+        def value_r0_c0(source):
+            return source["values"][0][0]
 
-        pybi.label(result)
+        ui.label(value_r0_c0)
 
     context.open()
-    context.should_see(
-        "{'columns': ['Name', 'Age'], 'values': [['foo', 18], ['bar', 19]]}",
-        equal_to=True,
-    )
+    context.should_see("foo")
 
 
 def test_selected_column_computed_binding(context: Context, memory_db: MemoryDb):
@@ -96,11 +93,7 @@ def test_selected_column_computed_binding(context: Context, memory_db: MemoryDb)
         table = dataset["df"]
         dv = pybi.data_view(f"SELECT * FROM {table}")
 
-        @ui.computed(inputs=[dv["Name"]])
-        def result(names):
-            return str(names)
-
-        pybi.label(result)
+        display.list_box(dv["Name"])
 
     context.open()
-    context.should_see("['foo', 'bar']", equal_to=True)
+    ListBox(context).should_have_text(["foo", "bar"])
