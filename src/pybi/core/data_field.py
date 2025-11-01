@@ -19,7 +19,7 @@ class DataField(SqlQueryProtocol):
         page_state = PageState.get()
         central = page_state.central
         sql_store = page_state.sql_store
-        qid, refs, template = sql_store.gen_query_info(sql)
+        qid, refs, template = sql_store.gen_query_info(sql, dataset_id=dataset.id)
         central.add_sql(qid, "query", template, refs)
 
         self.__sql_id = qid

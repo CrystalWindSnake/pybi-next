@@ -10,8 +10,6 @@ def view_info():
 
     @ui.computed(inputs=[central.sql_table, central.filters_state])
     def data(sql_table: dict[str, dict], filters: dict[str, dict]):
-        print(sql_table)
-
         return [
             {
                 "sql_id": sql_id,

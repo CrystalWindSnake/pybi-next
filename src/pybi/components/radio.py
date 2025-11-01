@@ -59,7 +59,6 @@ return central.addFilters(filters, cp_id, filter_target_id, field, expr, realVal
         filters: dict,
         *_: Any,
     ) -> list[dict]:
-        print(f"radio_group_options: {cp_id}, {sql_id}, {filters}")
         sql, params = get_sql(
             sql_id, sql_table=sql_table, filters=filters, exclude_components=[cp_id]
         )

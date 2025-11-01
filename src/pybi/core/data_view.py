@@ -21,7 +21,7 @@ class DataView(SqlQueryProtocol):
         page_state = PageState.get()
         central = page_state.central
         sql_store = page_state.sql_store
-        dv_id, refs, template = sql_store.gen_data_view_info(sql)
+        dv_id, refs, template = sql_store.gen_data_view_info(sql, dataset_id=dataset.id)
         central.add_sql(dv_id, "data_view", template, refs)
 
         self.__sql_id = dv_id
