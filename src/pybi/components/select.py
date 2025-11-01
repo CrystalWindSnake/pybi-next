@@ -1,69 +1,75 @@
 import typing
 from typing_extensions import Unpack
-from instaui import arco, ui
-from instaui.arco import component_types
-from pybi.link_sql.data_view_store import get_store as get_view_store
-from pybi.link_sql._mixin import DataColumnMixin
-from pybi.link_sql import _server_query, _types
+from instaui import ui
+from instaui_tdesign import td
+from instaui_tdesign.components.select import TSelectProps
+from pybi.core.data_view import DataField
+from pybi.core import _utils
+from pybi.core.sql_store import get_sql
 
 _DEFAULT_PROPS = {
-    "allow-clear": True,
+    "clearable": True,
 }
 
 
 def select(
-    options: DataColumnMixin,
-    value: typing.Optional[ui.TMaybeRef[typing.Union[str, int]]] = None,
-    **kwargs: Unpack[component_types.TSelect],
+    options: DataField,
+    value: typing.Optional[typing.Union[str, int]] = None,
+    **kwargs: Unpack[TSelectProps],
 ):
-    source_type = options.get_source_type()
-    source_name = options.source_name
+    options = options.distinct()
     field = options.field
-    store = get_view_store()
+    cp_id = options.gen_component_id()
+    sid = options.sql_id
 
-    exclude_filter: typing.Optional[_types.TExcludeFilter] = None
-    if source_type == "view":
-        exclude_filter = {
-            "view_name": source_name,
-            "query_key": f"{field}-{store.gen_field_query_id(field)}",
-        }
+    filter_result, dataset = _utils.filterable(options)
 
-    query_name = store.gen_query(
-        f"SELECT DISTINCT {field} FROM {source_name} ORDER BY {field} ASC"
+    select_changed = ui.js_event(
+        inputs=[
+            ui.event_context.e(),
+            field,
+            cp_id,
+            *filter_result.event_inputs,
+        ],
+        outputs=[filter_result.event_output],
+        code=r"""(value, field, cp_id, central, filters, filter_target_id, deps_of_data_view_ids)=> {
+if (!central) return;
+        
+if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+    return central.removeFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids);
+}
+
+const realValue = Array.isArray(value)? value : [value];
+const expr = `${field} in ?`
+return central.addFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids, field, expr, realValue);
+
+}""",
     )
 
-    source_from_server = _server_query.create_source(
-        query_name,
-        exclude_filter=exclude_filter,
-    ).flat_values()
+    sourceable_result, _ = _utils.sourceable(options)
 
-    props = {**_DEFAULT_PROPS, "placeholder": field, **kwargs}
-
-    element = arco.select(options=source_from_server, value=value, **props)  # type: ignore
-
-    if source_type == "view":
-        assert exclude_filter is not None
-
-        on_change = ui.js_event(
-            inputs=[
-                ui.event_context.e(),
-                source_name,
-                field,
-                exclude_filter["query_key"],
-                store._add_filters_js_handler,
-                store._remove_filters_js_handler,
-            ],
-            outputs=[store._element_ref],
-            code=r"""(value,view_name,field,query_key,addFilter,removeFilter) => {
-
-    if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)){
-        return removeFilter(view_name, query_key)
-    }
-
-    const realValue = Array.isArray(value)? value : [value];
-    return addFilter(view_name, query_key, {expr: `${field} in ?`,value:realValue})
-    }""",
+    @ui.computed(
+        inputs=[
+            cp_id,
+            sid,
+            *sourceable_result.inputs,
+        ]
+    )
+    def select_options(
+        cp_id: str,
+        sql_id: str,
+        sql_table: dict,
+        filters: dict,
+        *_: typing.Any,
+    ) -> list[str]:
+        sql, params = get_sql(
+            sql_id, sql_table=sql_table, filters=filters, exclude_components=[cp_id]
         )
-        element.on_change(on_change)
 
-    return element
+        return [row[0] for row in dataset.query(sql, params)["values"]]
+
+    props = {**_DEFAULT_PROPS, **kwargs}
+
+    return td.select(select_options, value=value, label=f"{field}:", **props).on_change(
+        select_changed
+    )

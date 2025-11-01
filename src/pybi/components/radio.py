@@ -1,59 +1,76 @@
+from typing import Any
 from typing_extensions import Unpack
-from instaui import arco, ui
-from instaui.arco import component_types
-
-from pybi.link_sql.data_view_store import get_store as get_view_store
-from pybi.link_sql._mixin import DataColumnMixin
-from pybi.link_sql import _server_query
+from instaui import ui
+from instaui_tdesign import td
+from instaui_tdesign.components.radio import TRadioGroupProps
+from pybi.core.data_view import DataField
+from pybi.core import _utils
+from pybi.core.sql_store import get_sql
 
 _DEFAULT_PROPS = {}
 
 
 def radio(
-    options: DataColumnMixin,
-    **kwargs: Unpack[component_types.TRadio],
+    options: DataField,
+    **kwargs: Unpack[TRadioGroupProps],
 ):
-    source_type = options.get_source_type()
-    source_name = options.source_name
+    options = options.distinct(order_by=f"{options.field} asc")
     field = options.field
+    cp_id = options.gen_component_id()
+    sid = options.sql_id
 
-    exclude_filter_view_name = None
-    exclude_filter_query_key = None
-    if source_type == "view":
-        exclude_filter_view_name = source_name
-        exclude_filter_query_key = (
-            f"{field}-{get_view_store().gen_field_query_id(field)}"
+    filter_result, dataset = _utils.filterable(options)
+
+    radio_changed = ui.js_event(
+        inputs=[
+            ui.event_context.e(),
+            field,
+            cp_id,
+            *filter_result.event_inputs,
+        ],
+        outputs=[filter_result.event_output],
+        code=r"""(value, field, cp_id, central, filters, filter_target_id, deps_of_data_view_ids)=> {
+if (!central) return;
+if (value === null || value === undefined || value === '') {
+    return central.removeFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids);
+}
+
+const realValue = Array.isArray(value)? value : [value];
+const expr = `${field} in ?`
+return central.addFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids, field, expr, realValue);
+
+}""",
+    )
+
+    sourceable_result, _ = _utils.sourceable(options)
+
+    @ui.computed(
+        inputs=[
+            cp_id,
+            sid,
+            *sourceable_result.inputs,
+        ]
+    )
+    def radio_group_options(
+        cp_id: str,
+        sql_id: str,
+        sql_table: dict,
+        filters: dict,
+        *_: Any,
+    ) -> list[dict]:
+        print(f"radio_group_options: {cp_id}, {sql_id}, {filters}")
+        sql, params = get_sql(
+            sql_id, sql_table=sql_table, filters=filters, exclude_components=[cp_id]
         )
 
-    source_from_server = _server_query.create_source(
-        f"SELECT DISTINCT {field} FROM {source_name}",
-        exclude_filter_view_name=exclude_filter_view_name,
-        exclude_filter_query_key=exclude_filter_query_key,
-    ).flat_values()
+        return [
+            {
+                "label": row[0],
+                "value": row[0],
+            }
+            for row in dataset.query(sql, params)["values"]
+        ]
 
-    props = {**_DEFAULT_PROPS, **kwargs, "options": source_from_server}
+    props = {**_DEFAULT_PROPS, **kwargs}
 
-    element = arco.radio_group(**props)
-
-    if source_type == "view":
-        view_store = get_view_store()
-
-        on_change = ui.js_event(
-            inputs=[
-                ui.event_context.e(),
-                view_store.get_filters(source_name),
-                exclude_filter_query_key,
-                field,
-            ],
-            outputs=[view_store.get_filters(source_name)],
-            code=r"""(value,filters,query_key,field) => {
-
-    if (value === null || value === undefined || value === '' ){
-        const {[query_key]:_, ...rest} = filters
-        return rest    
-    }
-
-    return {...filters, [query_key]: {expr: `${field} in ?`,value}}
-    }""",
-        )
-        element.on_change(on_change)
+    return td.radio_group(options=radio_group_options, **props).on_change(radio_changed)

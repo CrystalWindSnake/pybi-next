@@ -1,31 +1,44 @@
+from typing import Any
 from typing_extensions import Unpack
-from instaui import arco, ui
-from instaui.arco import component_types
+from instaui import ui
+from instaui_tdesign import td
+from instaui_tdesign.components.table import TPrimaryTableProps
+from pybi.core.data_view import DataView
+from pybi.core import _utils
+from pybi.core.sql_store import get_sql
 
-from pybi.link_sql._mixin import DataTableMixin
-from pybi.link_sql import _server_query
+_DEFAULT_PROPS = {}
 
 
 def table(
-    query: DataTableMixin,
-    **kwargs: Unpack[component_types.TTable],
+    data: DataView,
+    **kwargs: Unpack[TPrimaryTableProps],
 ):
-    query_name = query.get_query_name()
-    dataset_id = query.dataset_id
+    cp_id = data.gen_component_id()
+    sid = data.sql_id
 
-    source_from_server = _server_query.create_source(query_name, dataset_id=dataset_id)
+    sourceable_result, dataset = _utils.sourceable(data)
 
-    info = ui.js_computed(
-        inputs=[source_from_server.source],
-        code=r"""source=>{
-        const columns = source.columns;
-        const values = source.values;
-        const real_cols = columns.map(col => ({title: col, dataIndex: col, ellipsis: true, tooltip: true}));
-        const real_values = values.map(row => Object.fromEntries(row.map((value,index) => [columns[index], value])));
-        return {columns: real_cols, data: real_values};                     
-}""",
+    @ui.computed(
+        inputs=[
+            cp_id,
+            sid,
+            *sourceable_result.inputs,
+        ]
     )
+    def table_data(cp_id: str, sql_id: str, sql_table: dict, filters: dict, *_: Any):
+        sql, params = get_sql(
+            sql_id, sql_table=sql_table, filters=filters, exclude_components=[cp_id]
+        )
 
-    args = {**kwargs, "columns": info["columns"], "data": info["data"]}
+        result = dataset.query(sql, params)
+        data = [
+            {col: val for col, val in zip(result["columns"], row)}
+            for row in result["values"]
+        ]
 
-    return arco.table(**args)
+        return {"data": data, "columns": result["columns"]}
+
+    props = {**_DEFAULT_PROPS, **kwargs}
+
+    return td.table(table_data["data"], **props)

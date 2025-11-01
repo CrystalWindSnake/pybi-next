@@ -1,9 +1,7 @@
 from pathlib import Path
 from typing import Dict, List, Optional
-
-from pybi.link_sql import data_set_store
-from pybi.link_sql._mixin import DataSetMixin
-from pybi.link_sql.data_view import DataView
+from pybi.core._mixins import DataSetMixin
+from pybi.core.data_view import DataView
 
 try:
     import pandas
@@ -16,19 +14,17 @@ class DuckdbDataFrameDataSet(DataSetMixin):
     def __init__(self, dataframes: Optional[Dict[str, "pandas.DataFrame"]] = None):
         super().__init__()
         self._conn = duckdb.connect(":default:", read_only=False)
-        self._id = data_set_store.store_data_set(self)
-
         self.import_dataframe(dataframes or {})
 
     def import_dataframe(self, dataframes: Dict[str, "pandas.DataFrame"]):
         for name, df in dataframes.items():
             _dataframe_import_to_db(self._conn, df, name)
 
-    def get_id(self) -> int:
-        return self._id
-
     def __getitem__(self, table: str):
-        return DataView(f"select * from {table}", dataset=self)
+        return DataView(
+            f"select * from {table}",
+            dataset=self,
+        )
 
     def query(self, sql: str, params: Optional[List] = None):
         return _query(self._conn, sql, params)
@@ -38,10 +34,6 @@ class DuckdbFileDataSet(DataSetMixin):
     def __init__(self, file: Path):
         super().__init__()
         self._conn = duckdb.connect(file, read_only=True)
-        self._id = data_set_store.store_data_set(self)
-
-    def get_id(self) -> int:
-        return self._id
 
     def __getitem__(self, table: str):
         return DataView(f"select * from {table}", dataset=self)
