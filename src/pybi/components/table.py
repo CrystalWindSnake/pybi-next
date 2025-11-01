@@ -14,10 +14,11 @@ def table(
     data: DataView,
     **kwargs: Unpack[TPrimaryTableProps],
 ):
-    cp_id = data.gen_component_id()
+    cp_id = _utils.gen_component_id()
     sid = data.sql_id
+    data.bind_component(cp_id)
 
-    sourceable_result, dataset = _utils.sourceable(data)
+    sourceable_result, dataset = _utils.sourceable(data, cp_id)
 
     @ui.computed(
         inputs=[

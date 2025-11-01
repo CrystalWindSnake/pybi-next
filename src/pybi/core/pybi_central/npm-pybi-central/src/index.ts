@@ -7,6 +7,7 @@ import type {
   TSignals,
   TSqlTable,
 } from "./types";
+import { SqlTableResolver } from "./sql-table-resolver";
 
 type TProps = {
   signals: TSignals;
@@ -16,21 +17,28 @@ type TProps = {
 export default defineComponent({
   props: ["signals", "sqlTable"],
   setup(props: TProps, { expose }) {
+    const { getValue } = useBindingGetter();
+    const sqlTableResolver = new SqlTableResolver(getValue(props.sqlTable));
+
     expose({
-      ...getFiltersExpose(props),
+      ...getFiltersExpose(props, sqlTableResolver),
     });
   },
 });
 
-function getFiltersExpose(props: TProps) {
+function getFiltersExpose(props: TProps, sqlTableResolver: SqlTableResolver) {
   const { getValue } = useBindingGetter();
   const { signals } = props;
 
-  function notifySignal(depsOfDataViewIds: TSqlId[]) {
+  function notifySignal(filterSqlId: TSqlId, excludeComponentId: TComponentId) {
     const realSignals = getValue(signals);
+    const depsOfComponentIds = sqlTableResolver.getComponentsToNotify(
+      filterSqlId,
+      excludeComponentId
+    );
 
-    for (const sqlId of depsOfDataViewIds) {
-      realSignals[sqlId] = !realSignals[sqlId];
+    for (const componentId of depsOfComponentIds) {
+      realSignals[componentId] = !realSignals[componentId];
     }
   }
 
@@ -38,7 +46,6 @@ function getFiltersExpose(props: TProps) {
     filters: TFilters,
     componentId: TComponentId,
     filterTargetId: TSqlId,
-    depsOfDataViewIds: TSqlId[],
     field: string,
     expr: string,
     value: any
@@ -46,7 +53,7 @@ function getFiltersExpose(props: TProps) {
     const prevFilterItem = filters[filterTargetId] ?? {};
     const prevComponentFilters = prevFilterItem[componentId] ?? {};
 
-    notifySignal(depsOfDataViewIds);
+    notifySignal(filterTargetId, componentId);
 
     return {
       ...filters,
@@ -63,8 +70,7 @@ function getFiltersExpose(props: TProps) {
   function removeFilters(
     filters: TFilters,
     componentId: TComponentId,
-    filterTargetId: TSqlId,
-    depsOfDataViewIds: TSqlId[]
+    filterTargetId: TSqlId
   ): TFilters {
     const prevFilterItem = filters[filterTargetId];
     if (!prevFilterItem) return filters;
@@ -74,7 +80,7 @@ function getFiltersExpose(props: TProps) {
 
     const { [componentId]: _, ...rest } = prevFilterItem;
 
-    notifySignal(depsOfDataViewIds);
+    notifySignal(filterTargetId, componentId);
     return {
       ...filters,
       [filterTargetId]: rest,

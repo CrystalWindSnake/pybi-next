@@ -3,7 +3,7 @@ from typing import Optional
 import weakref
 
 from .page_state import PageState
-from ._types import TSqlId
+from ._types import TComponentId, TSqlId
 from ._mixins import SqlQueryProtocol, DataSetMixin
 from pybi.systems import sql_system
 
@@ -21,7 +21,6 @@ class DataField(SqlQueryProtocol):
         sql_store = page_state.sql_store
         qid, refs, template = sql_store.gen_query_info(sql)
         central.add_sql(qid, "query", template, refs)
-        central.register_signal(qid)
 
         self.__sql_id = qid
         self._field = field
@@ -55,5 +54,5 @@ class DataField(SqlQueryProtocol):
             dataset=self.dataset,
         )
 
-    def gen_component_id(self) -> TSqlId:
-        return self._component_store.gen_component_id()
+    def bind_component(self, component_id: TComponentId):
+        PageState.get().central.bind_component_to_source(self.__sql_id, component_id)

@@ -14,10 +14,11 @@ def radio(
     options: DataField,
     **kwargs: Unpack[TRadioGroupProps],
 ):
+    cp_id = _utils.gen_component_id()
     options = options.distinct(order_by=f"{options.field} asc")
     field = options.field
-    cp_id = options.gen_component_id()
     sid = options.sql_id
+    options.bind_component(cp_id)
 
     filter_result, dataset = _utils.filterable(options)
 
@@ -29,20 +30,20 @@ def radio(
             *filter_result.event_inputs,
         ],
         outputs=[filter_result.event_output],
-        code=r"""(value, field, cp_id, central, filters, filter_target_id, deps_of_data_view_ids)=> {
+        code=r"""(value, field, cp_id, central, filters, filter_target_id)=> {
 if (!central) return;
 if (value === null || value === undefined || value === '') {
-    return central.removeFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids);
+    return central.removeFilters(filters, cp_id, filter_target_id);
 }
 
 const realValue = Array.isArray(value)? value : [value];
 const expr = `${field} in ?`
-return central.addFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids, field, expr, realValue);
+return central.addFilters(filters, cp_id, filter_target_id, field, expr, realValue);
 
 }""",
     )
 
-    sourceable_result, _ = _utils.sourceable(options)
+    sourceable_result, _ = _utils.sourceable(options, cp_id)
 
     @ui.computed(
         inputs=[

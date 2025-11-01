@@ -1,78 +1,78 @@
-import {
-  type SqlParserOptions,
-  type TSqlId,
-  type TSqlTable,
-  type TSqlTableRecordType,
-} from "./types";
+import { type TComponentId, type TSqlId, type TSqlTable } from "./types";
 
 export class SqlTableResolver {
-  private sqlTable: TSqlTable;
-  private options: SqlParserOptions;
-  private dependencyMap: Record<TSqlId, Set<TSqlId>> = {};
+  private downstreamComponentMap: Map<TSqlId, Set<TComponentId>>;
 
-  constructor(sqlTable: TSqlTable, options: SqlParserOptions) {
-    this.sqlTable = sqlTable;
-    this.options = options;
-
-    // 初始化依赖关系
-    this.buildDependencies();
+  constructor(private sqlTable: TSqlTable) {
+    this.downstreamComponentMap = new Map();
+    this.buildDownstreamComponentMap();
   }
 
-  /**
-   * 从模板中提取依赖项（如 DataView(dv1) 或 Query(q1)）
-   */
-  private extractDependencies(template: string): string[] {
-    const deps: string[] = [];
-    const regex = new RegExp(
-      `\\b(?:${this.options.dataViewTagName}|${this.options.queryTagName})\\s*\\(([^)]+)\\)`,
-      "g"
-    );
-    let match;
-    while ((match = regex.exec(template))) {
-      deps.push(match[1].trim());
-    }
-    return deps;
-  }
-
-  /**
-   * 构建完整依赖图
-   */
-  private buildDependencies() {
-    for (const [id, record] of Object.entries(this.sqlTable)) {
-      const deps = new Set<TSqlId>([
-        ...(record.references || []),
-        ...this.extractDependencies(record.template),
-      ]);
-      this.dependencyMap[id] = deps;
-    }
-  }
-
-  /**
-   * 获取指定 SqlId 的所有依赖（深度优先搜索）
-   * @param targetId 目标 SQL ID
-   * @param filterType 可选，仅返回指定类型的依赖（如 "data_view"）
-   */
-  public getAllDependenciesOf(
-    targetId: TSqlId,
-    filterType?: TSqlTableRecordType
-  ): TSqlId[] {
-    const visited = new Set<TSqlId>();
-    const result: TSqlId[] = [];
-
-    const dfs = (id: TSqlId) => {
-      const deps = this.dependencyMap[id];
-      if (!deps) return;
-      for (const dep of deps) {
-        if (visited.has(dep)) continue;
-        visited.add(dep);
-        if (!filterType || this.sqlTable[dep]?.type === filterType) {
-          result.push(dep);
+  private buildDownstreamComponentMap(): void {
+    // First build dependency graph of sql ids
+    const sqlDependencyMap = new Map<TSqlId, Set<TSqlId>>();
+    for (const [sqlId, record] of Object.entries(this.sqlTable)) {
+      for (const refId of record.references) {
+        if (!sqlDependencyMap.has(refId)) {
+          sqlDependencyMap.set(refId, new Set());
         }
-        dfs(dep);
+        sqlDependencyMap.get(refId)!.add(sqlId);
       }
-    };
+    }
 
-    dfs(targetId);
-    return result;
+    // Then build component map for each sql id
+    for (const [sqlId, _] of Object.entries(this.sqlTable)) {
+      const componentIds = new Set<TComponentId>();
+      const visited = new Set<TSqlId>();
+      const queue = [...(sqlDependencyMap.get(sqlId) || [])];
+
+      while (queue.length > 0) {
+        const currentId = queue.shift()!;
+        visited.add(currentId);
+
+        // Add components of current sql id
+        for (const componentId of this.sqlTable[currentId].components || []) {
+          componentIds.add(componentId);
+        }
+
+        // Add dependencies to queue
+        for (const nextId of sqlDependencyMap.get(currentId) || []) {
+          if (!visited.has(nextId)) {
+            queue.push(nextId);
+          }
+        }
+      }
+
+      this.downstreamComponentMap.set(sqlId, componentIds);
+    }
+  }
+
+  public getDownstreamComponentIds(sqlId: TSqlId): Set<TComponentId> {
+    return this.downstreamComponentMap.get(sqlId) || new Set();
+  }
+
+  public getComponents(sqlId: TSqlId): Set<TComponentId> {
+    const record = this.sqlTable[sqlId];
+    return record?.components ? new Set(record.components) : new Set();
+  }
+
+  public getComponentsToNotify(sqlId: TSqlId, excludeComponentId: TComponentId): Set<TComponentId> {
+    const components = new Set<TComponentId>();
+    
+    // Add current components
+    for (const id of this.getComponents(sqlId)) {
+      if (id !== excludeComponentId) {
+        components.add(id);
+      }
+    }
+
+    // Add downstream components
+    for (const id of this.getDownstreamComponentIds(sqlId)) {
+      if (id !== excludeComponentId) {
+        components.add(id);
+      }
+    }
+
+    return components;
   }
 }

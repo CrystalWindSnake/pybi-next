@@ -1,7 +1,7 @@
 from __future__ import annotations
 from instaui import ui
 from instaui_tdesign import td
-from .page_state import PageState
+from pybi.core.page_state import PageState
 
 
 def view_info():
@@ -10,12 +10,15 @@ def view_info():
 
     @ui.computed(inputs=[central.sql_table, central.filters_state])
     def data(sql_table: dict[str, dict], filters: dict[str, dict]):
+        print(sql_table)
+
         return [
             {
                 "sql_id": sql_id,
                 "template": info["template"],
                 "type": info["type"],
-                "references": info["references"],
+                "references": info.get("references", []),
+                "components": info.get("components", []),
                 "filters": repr(filters.get(sql_id, {})),
             }
             for sql_id, info in sql_table.items()

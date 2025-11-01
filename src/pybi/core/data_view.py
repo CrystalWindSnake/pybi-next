@@ -2,7 +2,7 @@ from __future__ import annotations
 import weakref
 
 from .page_state import PageState
-from ._types import TSqlId
+from ._types import TComponentId, TSqlId
 from ._mixins import SqlQueryProtocol, DataSetMixin
 from .data_field import DataField
 
@@ -23,10 +23,8 @@ class DataView(SqlQueryProtocol):
         sql_store = page_state.sql_store
         dv_id, refs, template = sql_store.gen_data_view_info(sql)
         central.add_sql(dv_id, "data_view", template, refs)
-        central.register_signal(dv_id)
 
         self.__sql_id = dv_id
-        self._component_store = page_state.component_store
         self._dataset = weakref.ref(dataset)
 
     @property
@@ -52,5 +50,5 @@ class DataView(SqlQueryProtocol):
     def __repr__(self):
         return str(self)
 
-    def gen_component_id(self) -> TSqlId:
-        return self._component_store.gen_component_id()
+    def bind_component(self, component_id: TComponentId):
+        PageState.get().central.bind_component_to_source(self.__sql_id, component_id)

@@ -11,18 +11,14 @@ export type TFilterItem = Record<
 >;
 
 export type TFilters = Record<TSqlId, TFilterItem>;
-export type TSignals = Record<TSqlId, boolean>;
+export type TSignals = Record<TComponentId, boolean>;
 export type TSqlTableRecordType = "data_view" | "query";
 
 export interface TSqlTableRecord {
   template: string;
   type: TSqlTableRecordType;
   references: TSqlId[];
+  components?: TComponentId[];
 }
 
 export type TSqlTable = Record<TSqlId, TSqlTableRecord>;
-
-export interface SqlParserOptions {
-  dataViewTagName: string;
-  queryTagName: string;
-}

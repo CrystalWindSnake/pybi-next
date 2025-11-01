@@ -17,8 +17,9 @@ def input(
     value: typing.Optional[str] = None,
     **kwargs: Unpack[TInputProps],
 ):
+    cp_id = _utils.gen_component_id()
     field = field_data.field
-    cp_id = field_data.gen_component_id()
+    field_data.bind_component(cp_id)
 
     filter_result, _ = _utils.filterable(field_data)
 
@@ -30,16 +31,16 @@ def input(
             *filter_result.event_inputs,
         ],
         outputs=[filter_result.event_output],
-        code=r"""(value, field, cp_id, central, filters, filter_target_id, deps_of_data_view_ids)=> {
+        code=r"""(value, field, cp_id, central, filters, filter_target_id)=> {
         if (!central) return;
         value = value.trim()
         if (value && value.length > 0) {
             value = `%${value.trim()}%`
             const expr = `${field} like ?`
-            return central.addFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids, field, expr, value);
+            return central.addFilters(filters, cp_id, filter_target_id, field, expr, value);
         }
 
-        return central.removeFilters(filters, cp_id, filter_target_id, deps_of_data_view_ids);
+        return central.removeFilters(filters, cp_id, filter_target_id);
         }""",
     )
 
