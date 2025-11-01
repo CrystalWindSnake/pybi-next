@@ -121,32 +121,33 @@ def get_sql(
         template = entry["template"]
         params = []
 
-        if not entry["references"]:
-            if entry["type"] == "data_view" and filters and sid in filters:
-                valid_filters = []
-                for comp_id, conditions in filters[sid].items():
-                    if exclude_components and comp_id in exclude_components:
-                        continue
-                    for condition in conditions.values():
-                        valid_filters.append(condition["expr"])
-                        if "value" in condition:
-                            params.append(condition["value"])
+        if entry["references"]:
+            subqueries = {}
+            all_params = []
+            for ref_id in entry["references"]:
+                sub_sql, sub_params = build_sql(ref_id)
+                subqueries[ref_id] = f"({sub_sql})"
+                all_params.extend(sub_params)
+            sql = template.format(**subqueries)
+            params = all_params
+        else:
+            sql = template
 
-                if valid_filters:
-                    where_clause = " where " + " and ".join(valid_filters)
-                    return template + where_clause, params
+        if entry["type"] == "data_view" and filters and sid in filters:
+            valid_filters = []
+            for comp_id, conditions in filters[sid].items():
+                if exclude_components and comp_id in exclude_components:
+                    continue
+                for condition in conditions.values():
+                    valid_filters.append(condition["expr"])
+                    if "value" in condition:
+                        params.append(condition["value"])
 
-            return template, params
+            if valid_filters:
+                where_clause = " where " + " and ".join(valid_filters)
+                sql = f"select * from ({sql}){where_clause}"
 
-        subqueries = {}
-        all_params = []
-        for ref_id in entry["references"]:
-            sub_sql, sub_params = build_sql(ref_id)
-            subqueries[ref_id] = f"({sub_sql})"
-            all_params.extend(sub_params)
-
-        sql = template.format(**subqueries)
-        return sql, all_params
+        return sql, params
 
     sql, params = build_sql(sql_id)
     return sql, params or None
