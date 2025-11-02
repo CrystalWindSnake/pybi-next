@@ -19,9 +19,12 @@ def input(
 ):
     cp_id = _utils.gen_component_id()
     field = field_data.field
-    field_data.bind_component(cp_id)
+    query = field_data.build_query()
+    query.bind_component(cp_id)
 
-    filter_result, _ = _utils.filterable(field_data)
+    filter_result, _ = _utils.filterable(
+        query, filter_target_id=field_data.source.sql_id
+    )
 
     input_changed = ui.js_event(
         inputs=[

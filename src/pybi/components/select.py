@@ -19,11 +19,15 @@ def select(
 ):
     cp_id = _utils.gen_component_id()
     options = options.distinct()
-    field = options.field
-    sid = options.sql_id
 
-    options.bind_component(cp_id)
-    filter_result, dataset = _utils.filterable(options)
+    query = options.build_query()
+    field = options.field
+    sid = query.sql_id
+
+    query.bind_component(cp_id)
+    filter_result, dataset = _utils.filterable(
+        query, filter_target_id=options.source.sql_id
+    )
 
     select_changed = ui.js_event(
         inputs=[
@@ -47,7 +51,7 @@ return central.addFilters(filters, cp_id, filter_target_id, field, expr, realVal
 }""",
     )
 
-    sourceable_result, _ = _utils.sourceable(options, cp_id)
+    sourceable_result, _ = _utils.sourceable(query, cp_id)
 
     @ui.computed(
         inputs=[

@@ -3,7 +3,7 @@ from __tests.testing_web.memory_db import MemoryDb
 from instaui import ui
 import pandas as pd
 import pybi
-from __tests.utils import Table, Select, display, ListBox
+from __tests.utils import Table, use_select_controls, display, ListBox
 
 
 def test_base(context: Context, memory_db: MemoryDb):
@@ -33,16 +33,16 @@ def test_upstream_data_view_update_affects_downstream(
         dv1 = pybi.data_view(f"SELECT * FROM {table}")
         dv2 = pybi.data_view(f"SELECT * FROM {dv1}")
 
-        pybi.select(dv1["Name"])
+        pybi.select(dv1["Name"]).classes("c-name")
         pybi.table(dv2)
 
     context.open()
 
     table = Table(context)
-    select = Select(context)
+    select = use_select_controls(context, selector=".c-name")
 
     table.should_rows_count(3)
-    select.select_item("foo")
+    select.select_option("foo")
     table.should_rows_count(2)
     table.should_values_any_cell("foo")
     table.should_values_not_any_cell("bar")
@@ -74,11 +74,11 @@ def test_computed_binding(context: Context, memory_db: MemoryDb):
         table = dataset["df"]
         dv = pybi.data_view(f"SELECT * FROM {table}")
 
-        @ui.computed(inputs=[dv])
-        def value_r0_c0(source):
+        @ui.computed(inputs=[dv.to_query()])
+        def value_r0_c0(source: pybi.TDataSetQuery):
             return source["values"][0][0]
 
-        ui.label(value_r0_c0)
+        ui.text(value_r0_c0)
 
     context.open()
     context.should_see("foo")

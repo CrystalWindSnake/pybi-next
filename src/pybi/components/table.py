@@ -1,9 +1,10 @@
-from typing import Any
+from typing import Any, Union
 from typing_extensions import Unpack
 from instaui import ui
 from instaui_tdesign import td
 from instaui_tdesign.components.table import TPrimaryTableProps
 from pybi.core.data_view import DataView
+from pybi.core.data_field import DataFieldSet
 from pybi.core import _utils
 from pybi.core.sql_store import get_sql
 
@@ -11,14 +12,16 @@ _DEFAULT_PROPS = {}
 
 
 def table(
-    data: DataView,
+    data: Union[DataView, DataFieldSet],
     **kwargs: Unpack[TPrimaryTableProps],
 ):
-    cp_id = _utils.gen_component_id()
-    sid = data.sql_id
-    data.bind_component(cp_id)
+    real_data = data.build_query() if isinstance(data, DataFieldSet) else data
 
-    sourceable_result, dataset = _utils.sourceable(data, cp_id)
+    cp_id = _utils.gen_component_id()
+    sid = real_data.sql_id
+    real_data.bind_component(cp_id)
+
+    sourceable_result, dataset = _utils.sourceable(real_data, cp_id)
 
     @ui.computed(
         inputs=[

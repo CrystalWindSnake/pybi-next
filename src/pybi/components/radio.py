@@ -14,13 +14,17 @@ def radio(
     options: DataField,
     **kwargs: Unpack[TRadioGroupProps],
 ):
+    options = options.distinct().order_by()
     cp_id = _utils.gen_component_id()
-    options = options.distinct(order_by=f"{options.field} asc")
     field = options.field
-    sid = options.sql_id
-    options.bind_component(cp_id)
+    query = options.build_query()
 
-    filter_result, dataset = _utils.filterable(options)
+    sid = query.sql_id
+    query.bind_component(cp_id)
+
+    filter_result, dataset = _utils.filterable(
+        query, filter_target_id=options.source.sql_id
+    )
 
     radio_changed = ui.js_event(
         inputs=[
@@ -43,7 +47,7 @@ return central.addFilters(filters, cp_id, filter_target_id, field, expr, realVal
 }""",
     )
 
-    sourceable_result, _ = _utils.sourceable(options, cp_id)
+    sourceable_result, _ = _utils.sourceable(query, cp_id)
 
     @ui.computed(
         inputs=[

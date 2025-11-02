@@ -3,7 +3,7 @@ from typing import Any
 
 from instaui import ui
 
-from pybi.core._types import TComponentId
+from pybi.core._types import TComponentId, TDataViewId
 from ._mixins import SqlQueryProtocol
 from .page_state import PageState
 
@@ -23,14 +23,10 @@ def gen_component_id():
     return PageState.get().component_store.gen_component_id()
 
 
-def filterable(query: SqlQueryProtocol):
+def filterable(query: SqlQueryProtocol, *, filter_target_id: TDataViewId):
     page_state = PageState.get()
     central = page_state.central
-    sql_store = page_state.sql_store
     dataset = query.dataset
-    sid = query.sql_id
-
-    filter_target_id = sql_store.get_dependency_of_first_data_view(sid)
 
     return FilterableResult(
         event_inputs=[

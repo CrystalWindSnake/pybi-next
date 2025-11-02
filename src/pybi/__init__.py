@@ -15,6 +15,7 @@ __all__ = [
     "table",
     "input",
     "radio",
+    "TDataSetQuery",
     # "echarts",
 ]
 
@@ -26,6 +27,7 @@ from .components.select import select
 from .components.table import table
 from .components.input import input
 from .fns.query_fn import data_view, data_query as query
+from .core._types import DataSetQueryInfo as TDataSetQuery
 
 # from .components.echarts import echarts
 # from .link_sql.query import Query as query

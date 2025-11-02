@@ -1,58 +1,150 @@
 from __future__ import annotations
-from typing import Optional
-import weakref
+from typing import TYPE_CHECKING, Literal, Optional, Sequence, cast
+from instaui import ui
 
 from .page_state import PageState
-from ._types import TComponentId, TSqlId
-from ._mixins import SqlQueryProtocol, DataSetMixin
-from pybi.systems import sql_system
+from pybi.core import _utils
+from pybi.systems import cache_system
+from pybi.core.data_query import DataQuery
+from pybi.core.sql_store import get_sql
 
 
-class DataField(SqlQueryProtocol):
+if TYPE_CHECKING:
+    from pybi.core.data_view import DataView
+
+
+TOrderBy = Literal["asc", "desc"]
+
+
+class DataField:
     def __init__(
         self,
         field: str,
         *,
-        sql: str,
-        dataset: DataSetMixin,
+        source: DataView,
+        distinct: bool = False,
+        order_by: Optional[TOrderBy] = None,
     ) -> None:
-        page_state = PageState.get()
-        central = page_state.central
-        sql_store = page_state.sql_store
-        qid, refs, template = sql_store.gen_query_info(sql, dataset_id=dataset.id)
-        central.add_sql(qid, "query", template, refs)
-
-        self.__sql_id = qid
         self._field = field
-        self._component_store = page_state.component_store
-        self._dataset = weakref.ref(dataset)
+        self._source = source
+        self._distinct = distinct
+        self._order_by = order_by
 
     @property
-    def sql_id(self) -> TSqlId:
-        return self.__sql_id
-
-    @property
-    def dataset(self) -> DataSetMixin:
-        obj = self._dataset()
-        assert obj is not None, "dataset has been garbage collected"
-        return obj
+    def source(self) -> DataView:
+        return self._source
 
     @property
     def field(self) -> str:
         return self._field
 
-    def __str__(self):
-        return f"Query({self.__sql_id})"
+    @cache_system.instance_cache
+    def flat_values(self) -> list:
+        query = self.build_query()
+        cp_id = PageState.get().component_store.gen_component_id()
+        query.bind_component(cp_id)
 
-    def __repr__(self):
-        return str(self)
+        sourceable_result, dataset = _utils.sourceable(query, cp_id)
 
-    def distinct(self, *, order_by: Optional[str] = None) -> DataField:
+        @ui.computed(
+            inputs=[
+                cp_id,
+                query.sql_id,
+                *sourceable_result.inputs,
+            ]
+        )
+        def values(
+            cp_id: str, sql_id: str, sql_table: dict, filters: dict, _
+        ) -> list[str]:
+            sql, params = get_sql(
+                sql_id, sql_table=sql_table, filters=filters, exclude_components=[cp_id]
+            )
+
+            return [row[0] for row in dataset.query(sql, params)["values"]]
+
+        return values
+
+    def distinct(
+        self,
+    ) -> DataField:
         return DataField(
             self._field,
-            sql=f"select distinct {self._field} from {self}{sql_system.create_order_by(order_by)}",
-            dataset=self.dataset,
+            source=self._source,
+            distinct=True,
+            order_by=cast(TOrderBy, self._order_by),
         )
 
-    def bind_component(self, component_id: TComponentId):
-        PageState.get().central.bind_component_to_source(self.__sql_id, component_id)
+    def order_by(
+        self,
+        order_by: TOrderBy = "asc",
+    ) -> DataField:
+        return DataField(
+            self._field, source=self._source, order_by=order_by, distinct=self._distinct
+        )
+
+    @cache_system.instance_cache
+    def build_query(self) -> DataQuery:
+        sql = f"SELECT {'DISTINCT ' if self._distinct else ''}{self._field} FROM {self._source}{'' if self._order_by is None else f' ORDER BY {self._field} {self._order_by}'}"
+        return DataQuery(sql, self._source.dataset)
+
+
+class DataFieldSet:
+    def __init__(
+        self,
+        fields: Sequence[str],
+        *,
+        source: DataView,
+        distinct: bool = False,
+        order_fields: Optional[Sequence[str]] = None,
+        orders: Optional[Sequence[TOrderBy]] = None,
+    ) -> None:
+        self._fields = fields
+        self._source = source
+        self._distinct = distinct
+        self._order_fields = order_fields
+        self._orders = orders
+
+    @property
+    def source(self) -> DataView:
+        return self._source
+
+    @property
+    def fields(self) -> list[str]:
+        return list(self._fields)
+
+    def distinct(
+        self,
+    ) -> DataFieldSet:
+        return DataFieldSet(
+            self._fields,
+            source=self._source,
+            distinct=True,
+            order_fields=self._order_fields,
+            orders=self._orders,
+        )
+
+    def order_by(
+        self,
+        fields: Sequence[str],
+        orders: Sequence[TOrderBy],
+    ) -> DataFieldSet:
+        return DataFieldSet(
+            self._fields,
+            source=self._source,
+            distinct=self._distinct,
+            order_fields=fields,
+            orders=orders,
+        )
+
+    @cache_system.instance_cache
+    def build_query(self) -> DataQuery:
+        distinct = "DISTINCT " if self._distinct else ""
+        fields = ", ".join(self._fields)
+        order_by = (
+            ""
+            if self._order_fields is None or self._orders is None
+            else f" ORDER BY {', '.join(f'{field} {order}' for field, order in zip(self._order_fields, self._orders))}"
+        )
+
+        sql = f"SELECT {distinct}{fields} FROM {self._source}{order_by}"
+        return DataQuery(sql, self._source.dataset)

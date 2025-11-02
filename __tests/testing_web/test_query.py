@@ -12,7 +12,7 @@ def test_base(context: Context, memory_db: MemoryDb):
     @context.register_page
     def index():
         table = dataset["df"]
-        gp = pybi.query(f"SELECT Name, AVG(Age) as Age FROM {table} GROUP BY Name")
+        gp = pybi.data_view(f"SELECT Name, AVG(Age) as Age FROM {table} GROUP BY Name")
         pybi.table(gp)
 
     context.open()
@@ -27,8 +27,7 @@ def test_select_columns(context: Context, memory_db: MemoryDb):
     @context.register_page
     def index():
         table = dataset["df"]
-        dv1 = pybi.query(f"SELECT * FROM {table}")
-        pybi.table(dv1[["Name", "Age"]])
+        pybi.table(table[["Name", "Age"]])
 
     context.open()
     table = Table(context)

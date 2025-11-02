@@ -1,5 +1,5 @@
 from typing import Dict
-from pybi.link_sql.duckdb_dataset import DuckdbDataFrameDataSet
+from pybi.core.duckdb_dataset import DuckdbDataFrameDataSet
 
 
 try:
